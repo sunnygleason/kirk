@@ -45,7 +45,7 @@ public class Deploy {
   }
 
   private void initializeScriptingContext() {
-    this.context = new ScriptingContainer(LocalContextScope.THREADSAFE);
+    this.context = new ScriptingContainer(LocalContextScope.SINGLETHREAD);
     this.bootstrapper = context.runScriptlet(
       PathType.ABSOLUTE, config.getBootstrapPath());
 

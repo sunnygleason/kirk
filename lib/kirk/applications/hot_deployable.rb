@@ -6,8 +6,7 @@ module Kirk
     class HotDeployable < Native::HotDeployableApplication
 
       def initialize(config)
-        super
-
+        super(config)
         redeploy
       end
 
@@ -44,7 +43,7 @@ module Kirk
 
       def deploy(d)
         d.prepare
-        super
+        super(d)
       end
     end
   end

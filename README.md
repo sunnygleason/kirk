@@ -85,11 +85,13 @@ abstracted are still hardcoded in the source.
   was fixed in the 1.6 branch but never backported to older versions of JRuby.
   Crazy stuff happens without the bug fix.
 
-* There is a memory leak if you are reloading an application that uses any of
-  the JDBC gems. This should be fixed on JRuby master but not the JRuby 1.6.0
-  RC 1 release.
+* The JDBC drivers will keep connections open unless they are explicitly
+  cleaned up, something which Rack applications do not do. A future release of
+  the jdbc ruby drivers will correctly clean up after the JDBC garbage, but for
+  now, you will have to manually do it. If you are running a Rails app, add the
+  following to the config.ru file:
 
-  UPDATE: There still seems to be a leak on master.
+    at_exit { ActiveRecord::Base.clear_all_connections! }
 
 ### Getting Help
 

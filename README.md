@@ -91,7 +91,7 @@ abstracted are still hardcoded in the source.
   now, you will have to manually do it. If you are running a Rails app, add the
   following to the config.ru file:
 
-    at_exit { ActiveRecord::Base.clear_all_connections! }
+      at_exit { ActiveRecord::Base.clear_all_connections! }
 
 ### Getting Help
 

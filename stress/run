@@ -10,9 +10,10 @@ def redeploy(path)
   FileUtils.touch File.expand_path("../#{path}/REVISION", __FILE__)
 end
 
-def background(int = 1)
+def background(int = 1, iterations = nil)
   t = Thread.new do
-    while true
+    while iterations.nil? || iterations > 0
+      iterations -= 1 if iterations
       sleep int
       yield
     end
@@ -55,7 +56,7 @@ unless ARGV.include?("--no-train-app")
   end
 
   # Reload
-  background 2 do
+  background 4 do
     redeploy "train_app"
   end
 end

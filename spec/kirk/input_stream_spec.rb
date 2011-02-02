@@ -83,6 +83,20 @@ describe 'Kirk::InputStream' do
     end
   end
 
+  it "can pass a string to read" do
+    with_input_stream do |input, writer|
+      writer << "zomgzomg"
+      writer.close
+
+      str = ''
+      input.read(3, str).should == 'zom'
+      str.should == 'zom'
+
+      input.read(3, str).should == 'gzo'
+      str.should == 'gzo'
+    end
+  end
+
   it "raises if trying to read a negative size" do
     with_input_stream do |input, writer|
       writer << "zomgzomg"

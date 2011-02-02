@@ -27,16 +27,20 @@ module Kirk
       @eof      = false
     end
 
-    def read(size = nil, buffer = '')
+    def read(size = nil, buffer = nil)
       one_loop = nil
       read_all = size.nil?
+
+      buffer ? buffer.slice!(0..-1) : buffer = ''
 
       raise ArgumentError, "negative length #{size} given" if size && size < 0
 
       loop do
         limit = size && size < CHUNK_SIZE ? size : CHUNK_SIZE
 
-        break unless len = read_chunk(limit, buffer)
+        len = read_chunk(limit, buffer)
+
+        break unless len
 
         one_loop = true
 
@@ -55,7 +59,9 @@ module Kirk
       buffer = ''
       curpos = pos
 
-      while read(READL_SIZE, buffer)
+      while chunk = read(READL_SIZE)
+        buffer << chunk
+
         if i = buffer.index(sep, 0)
           i += sep.bytesize
           buffer.slice!(i..-1)

@@ -31,6 +31,8 @@ module Kirk
       one_loop = nil
       read_all = size.nil?
 
+      raise ArgumentError, "negative length #{size} given" if size && size < 0
+
       loop do
         limit = size && size < CHUNK_SIZE ? size : CHUNK_SIZE
 
@@ -52,7 +54,6 @@ module Kirk
       sep    = "#{$/}#{$/}" if sep == ""
       buffer = ''
       curpos = pos
-      offset = 0
 
       while read(READL_SIZE, buffer)
         if i = buffer.index(sep, 0)
@@ -61,7 +62,6 @@ module Kirk
           seek(curpos + buffer.bytesize)
           break
         end
-        offset = buffer.bytesize
       end
 
       buffer

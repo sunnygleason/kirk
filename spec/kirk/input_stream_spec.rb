@@ -83,6 +83,15 @@ describe 'Kirk::InputStream' do
     end
   end
 
+  it "raises if trying to read a negative size" do
+    with_input_stream do |input, writer|
+      writer << "zomgzomg"
+      writer.close
+
+      lambda { input.read(-1) }.should raise_error(ArgumentError)
+    end
+  end
+
   it "raises if trying to seek to a negative value" do
     with_input_stream do |input, writer|
       writer << "zomgzomg"

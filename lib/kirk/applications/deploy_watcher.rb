@@ -86,35 +86,37 @@ module Kirk
 
         if new_last_modified > info[:last_modified]
           Kirk.logger.info("Reloading `#{app.application_path}`")
-          redeploy(app, new_last_modified)
+
+          # Redeploy the application
+          redeploy(app)
+
+          # Update the last modified time
+          info[:last_modified] = new_last_modified
         end
       end
     end
 
-    def redeploy(app, mtime)
-      if key = app.key
+    def redeploy(app)
+      app.deploy(get_standby_deploy(app))
+      warmup_standby_deploy(app)
+    end
 
-        queue  = @info[app][:standby]
-        deploy = queue.poll
+    def get_standby_deploy(app)
+      queue = @info[app][:standby]
+      key   = app.key
 
-        if deploy && deploy.key == key
-          app.deploy(deploy)
-        else
-          deploy.terminate if deploy
-          app.redeploy
-        end
+      return unless key
 
-        warmup_standby_deploy(app)
-      else
-        app.redeploy
+      while deploy = queue.poll
+        return deploy if deploy.key == key
+        # Otherwise, we don't need it anymore
+        background { deploy.terminate }
       end
-
-      @info[app][:last_modified] = mtime
     end
 
     def warmup_standby_deploy(app)
       queue = @info[app][:standby]
-      background { queue.put(app.build_deploy) }
+      background { queue.put(app.build_deploy) } if queue.size == 0
     end
 
     def cleanup

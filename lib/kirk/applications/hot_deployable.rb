@@ -7,7 +7,7 @@ module Kirk
 
       def initialize(config)
         super(config)
-        redeploy
+        deploy
       end
 
       def key
@@ -37,13 +37,10 @@ module Kirk
         mtimes.max
       end
 
-      def redeploy
-        deploy(build_deploy)
-      end
-
-      def deploy(d)
-        d.prepare
-        super(d)
+      def deploy(deploy = nil)
+        deploy ||= build_deploy
+        deploy.prepare
+        super(deploy)
       end
     end
   end

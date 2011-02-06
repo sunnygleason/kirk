@@ -110,22 +110,6 @@ describe 'Kirk::Server' do
     last_response.should be_missing
   end
 
-  it "doesn't require 'bundler/setup' if there is no Gemfile" do
-    start require_as_app_path('config.ru')
-
-    get '/'
-    last_response.should be_successful
-    last_response.should have_body('ActiveSupport')
-  end
-
-  it "requires 'bundler/setup' if there is a Gemfile" do
-    start bundled_app_path('config.ru')
-
-    get '/'
-    last_response.should be_successful
-    last_response.should have_body("required ActiveSupport\n" \
-                                   "failed to load Rake\n")
-  end
 
   it "reloads the server" do
     start randomized_app_path('config.ru')
@@ -143,34 +127,6 @@ describe 'Kirk::Server' do
 
     get '/'
     last_response.body.should_not == num
-  end
-
-  it "doesn't use stale standby instances" do
-    start bundled_app_path('config.ru')
-
-    get '/'
-    last_response.should have_body("required ActiveSupport\n" \
-                                   "failed to load Rake\n")
-
-    sleep 2
-
-    File.open bundled_app_path('Gemfile'), 'w' do |f|
-      f.puts <<-GEMFILE
-        source 'http://rubygems.org'
-
-        gem 'rack'
-        gem 'rake'
-        gem 'activesupport'
-      GEMFILE
-    end
-
-    touch bundled_app_path('REVISION')
-
-    sleep 2
-
-    get '/'
-    last_response.should have_body("required ActiveSupport\n" \
-                                   "successfully loaded Rake\n")
   end
 
   it "can watch a specified file to trigger redeploys" do

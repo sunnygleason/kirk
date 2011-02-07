@@ -1,17 +1,40 @@
 module SpecHelpers
-  attr_reader :stdout, :stderr, :stdin, :pid, :exit_status
+  attr_reader :last_command
 
-  def kirk(cmd = "")
-    IO.popen4("kirk #{cmd}") do |pid, stdin, stdout, stderr|
-      @stdout, @stderr, @stdin, @pid = stdout, stderr, stdin, pid
+  class Command
+    attr_reader :stdout, :stderr, :stdin, :pid, :exit_status
 
-      yield if block_given?
-
-      Process.kill("HUP", pid) rescue nil
+    def initialize(cmd)
+      @cmd         = cmd
+      @stdout      = nil
+      @stderr      = nil
+      @stdin       = nil
+      @pid         = nil
+      @exit_status = nil
     end
 
-    @exit_status = $?.exitstatus
-  ensure
-    @stdout, @stderr, @stdin, @pid = nil, nil, nil, nil
+    def run
+      IO.popen4(@cmd) do |pid, stdin, stdout, stderr|
+        @pid    = pid
+        @stdin  = stdin
+        @stdout = stdout
+        @stderr = stderr
+
+        begin
+          yield self if block_given?
+        ensure
+          Process.kill("HUP", @pid) rescue nil
+        end
+      end
+
+      @exit_status = $?.exitstatus
+    end
+  end
+
+  def kirk(cmd = "", &blk)
+    command = Command.new("kirk #{cmd}")
+    command.run(&blk)
+
+    @last_command = command
   end
 end

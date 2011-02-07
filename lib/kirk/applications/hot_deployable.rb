@@ -45,12 +45,15 @@ module Kirk
           super(deploy)
           true
         end
+      rescue Exception => e
+        Kirk.logger.warning "Deploying `#{application_path}` failed: #{e.message}"
+        nil
       end
 
       def build_deploy
         super
       rescue Exception => e
-        Kirk.logger.warning "Redeploying `#{application_path}` failed: #{e.message}"
+        Kirk.logger.warning "Warming up `#{application_path}` failed: #{e.message}"
         nil
       end
     end

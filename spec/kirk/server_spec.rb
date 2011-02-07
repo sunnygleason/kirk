@@ -150,13 +150,6 @@ describe 'Kirk::Server' do
     last_response.body.should_not == num
   end
 
-  def redeploy(path, &blk)
-    @client.disconnect if @client
-    @client = Kirk::Applications::RedeployClient.new('/tmp/kirk.sock')
-    @client.connect
-    @client.redeploy(path, &blk)
-  end
-
   after :each do
     @client.disconnect if @client
   end
@@ -167,13 +160,10 @@ describe 'Kirk::Server' do
     get '/'
     num = last_response.body
 
-    msgs = []
-    redeploy(randomized_app_path) { |log| msgs << log }
-    msgs.should == [
+    redeploy(randomized_app_path).should == [
       "Waiting for response...",
       "Redeploying application...",
-      "Redeploy complete."
-    ]
+      "Redeploy complete." ]
 
     get '/'
     last_response.body.should_not == num
@@ -185,15 +175,50 @@ describe 'Kirk::Server' do
     get '/'
     num = last_response.body
 
-    msgs = []
-    redeploy('/some/app/is/missing') { |log| msgs << log }
-    msgs.should == [
+    redeploy('/some/app/is/missing').should == [
       'Waiting for response...',
-      '[ERROR] No application running at `/some/app/is/missing`'
-    ]
+      '[ERROR] No application running at `/some/app/is/missing`' ]
 
     get '/'
     last_response.should have_body(num)
+  end
+
+  it "doesn't take down the application when an error happens during redeploy" do
+    start randomized_app_path('config.ru')
+
+    get '/'
+    num = last_response.body
+
+    File.open(randomized_app_path('config.ru'), 'w') do |f|
+      f.puts <<-RUBY
+        RAND = rand(10_000)
+
+        raise 'fail'
+
+        run lambda { |e| [ 200, { 'Content-Type' => 'text/plain' }, [ RAND.to_s ] ] }
+      RUBY
+    end
+
+    redeploy(randomized_app_path).should == [
+      "Waiting for response...",
+      "Redeploying application...",
+      "[ERROR] Something went wrong" ]
+
+    File.open(randomized_app_path('config.ru'), 'w') do |f|
+      f.puts <<-RUBY
+        RAND = "RAND"
+
+        run lambda { |e| [ 200, { 'Content-Type' => 'text/plain' }, [ RAND.to_s ] ] }
+      RUBY
+    end
+
+    redeploy(randomized_app_path).should == [
+      "Waiting for response...",
+      "Redeploying application...",
+      "Redeploy complete." ]
+
+    get '/'
+    last_response.should have_body('RAND')
   end
 
   it "can load config files relative to the current file" do

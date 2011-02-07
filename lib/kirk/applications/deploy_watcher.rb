@@ -89,7 +89,7 @@ module Kirk
       return unless @unix_socket
 
       conn = @unix_socket.accept_nonblock
-      line = conn.gets
+      line = conn.gets.chomp
 
       if line =~ /^REDEPLOY (.*)$/
         application_path = $1

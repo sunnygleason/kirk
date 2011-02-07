@@ -1,14 +1,18 @@
+require 'socket'
+
 module Kirk
   class Applications::DeployWatcher
     include Jetty::LifeCycle::Listener
 
-    def initialize
+    def initialize(unix_socket_path = nil)
       @apps, @magic_telephone, @workers = [], LinkedBlockingQueue.new, 0
+      @unix_socket, @unix_socket_path = nil, unix_socket_path
       @info = {}
     end
 
     def start
       raise "Watcher already started" if @thread
+      connect_unix_socket_server
       @thread = Thread.new { run_loop }
       @thread.abort_on_exception = true
       true
@@ -16,6 +20,9 @@ module Kirk
 
     def stop
       @magic_telephone.put :halt
+
+      disconnect_unix_socket_server
+
       @thread.join
       @thread = nil
       true
@@ -36,9 +43,32 @@ module Kirk
 
   private
 
+    def connect_unix_socket_server
+      return unless @unix_socket_path
+
+      umask = File.umask
+      File.umask(0137)
+
+      if File.exist?(@unix_socket_path)
+        File.delete(@unix_socket_path)
+      end
+
+      @unix_socket = UNIXServer.new(@unix_socket_path)
+    ensure
+      File.umask(umask)
+    end
+
+    def disconnect_unix_socket_server
+      @unix_socket.close if @unix_socket
+      File.delete(@unix_socket_path) if @unix_socket_path
+    end
+
     def run_loop
       while true
-        # First, pull off messages
+        # First, check if there are any pending connections
+        handle_redeploys_on_socket
+
+        # Then, pull off messages
         while msg = @magic_telephone.poll(50, TimeUnit::MILLISECONDS)
           return if msg == :halt
           handle_message(*msg)
@@ -53,6 +83,41 @@ module Kirk
       end
 
       cleanup
+    end
+
+    def handle_redeploys_on_socket
+      return unless @unix_socket
+
+      conn = @unix_socket.accept_nonblock
+      line = conn.gets
+
+      if line =~ /^REDEPLOY (.*)$/
+        application_path = $1
+        app = @apps.find { |a| a.application_path == application_path }
+
+        unless app
+          conn.write "ERROR No application running at `#{application_path}`\n"
+          return
+        end
+
+        conn.write "INFO Redeploying application...\n"
+
+        if redeploy(app)
+          conn.write "INFO Redeploy complete.\n"
+        else
+          conn.write "ERROR Something went wrong\n"
+        end
+      else
+        conn.write "ERROR unknown command\n"
+      end
+    rescue Errno::EAGAIN,
+           Errno::EWOULDBLOCK,
+           Errno::ECONNABORTED,
+           Errno::EPROTO,
+           Errno::EINTR
+      # Nothing
+    ensure
+      conn.close if conn
     end
 
     def handle_message(action, *args)
@@ -104,8 +169,9 @@ module Kirk
     end
 
     def redeploy(app)
-      app.deploy(get_standby_deploy(app))
+      ret = app.deploy(get_standby_deploy(app))
       warmup_standby_deploy(app)
+      ret
     end
 
     def get_standby_deploy(app)

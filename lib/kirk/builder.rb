@@ -12,7 +12,9 @@ module Kirk
       @root    = root || Dir.pwd
       @current = nil
       @configs = []
-      @options = { :watcher => Applications::DeployWatcher.new }
+      @options = {
+        :watcher => Applications::DeployWatcher.new("/tmp/kirk.sock")
+      }
     end
 
     def load(path)

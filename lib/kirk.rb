@@ -29,6 +29,7 @@ module Kirk
     autoload :DeployWatcher,  'kirk/applications/deploy_watcher'
     autoload :HotDeployable,  'kirk/applications/hot_deployable'
     autoload :Rack,           'kirk/applications/rack'
+    autoload :RedeployClient, 'kirk/applications/redeploy_client'
   end
 
   require 'kirk/builder'

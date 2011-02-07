@@ -150,6 +150,52 @@ describe 'Kirk::Server' do
     last_response.body.should_not == num
   end
 
+  def redeploy(path, &blk)
+    @client.disconnect if @client
+    @client = Kirk::Applications::RedeployClient.new('/tmp/kirk.sock')
+    @client.connect
+    @client.redeploy(path, &blk)
+  end
+
+  after :each do
+    @client.disconnect if @client
+  end
+
+  it "can redeploy an application on command" do
+    start randomized_app_path('config.ru')
+
+    get '/'
+    num = last_response.body
+
+    msgs = []
+    redeploy(randomized_app_path) { |log| msgs << log }
+    msgs.should == [
+      "Waiting for response...",
+      "Redeploying application...",
+      "Redeploy complete."
+    ]
+
+    get '/'
+    last_response.body.should_not == num
+  end
+
+  it "provides information when the application doesn't exist" do
+    start randomized_app_path('config.ru')
+
+    get '/'
+    num = last_response.body
+
+    msgs = []
+    redeploy('/some/app/is/missing') { |log| msgs << log }
+    msgs.should == [
+      'Waiting for response...',
+      '[ERROR] No application running at `/some/app/is/missing`'
+    ]
+
+    get '/'
+    last_response.should have_body(num)
+  end
+
   it "can load config files relative to the current file" do
     kirkup kirked_up_path("Kirkfile")
 

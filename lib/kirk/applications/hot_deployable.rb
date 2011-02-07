@@ -43,6 +43,7 @@ module Kirk
         if deploy
           deploy.prepare
           super(deploy)
+          true
         end
       end
 

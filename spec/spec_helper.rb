@@ -8,7 +8,8 @@ require 'net/http'
 
 Dir[File.expand_path('../support/*.rb', __FILE__)].each { |f| require f }
 
-IP_ADDRESS = IPSocket.getaddress(Socket.gethostname)
+IP_ADDRESS     = IPSocket.getaddress(Socket.gethostname)
+ORIGINAL_UMASK = File.umask
 
 RSpec.configure do |config|
   config.include SpecHelpers
@@ -19,6 +20,7 @@ RSpec.configure do |config|
   end
 
   config.after :each do
+    File.umask(ORIGINAL_UMASK)
     @server.stop if @server
   end
 end

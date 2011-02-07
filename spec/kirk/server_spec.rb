@@ -177,4 +177,11 @@ describe 'Kirk::Server' do
       end
     end.should raise_error(Kirk::MissingConfigFile)
   end
+
+  it "keeps the default umask in child applications" do
+    start umask_path('config.ru')
+
+    get '/'
+    last_response.should have_body("umask: 18")
+  end
 end

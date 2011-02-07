@@ -51,6 +51,10 @@ module SpecHelpers
     application_path('kirked_up', *args)
   end
 
+  def umask_path(*args)
+    application_path('umask', *args)
+  end
+
   def tmp(*args)
     root.join('tmp', *args)
   end

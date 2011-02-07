@@ -156,6 +156,8 @@ module Kirk
         new_last_modified = app.last_modified
         info = @info[app]
 
+        next unless new_last_modified
+
         if new_last_modified > info[:last_modified]
           Kirk.logger.info("Reloading `#{app.rackup_path}`")
 

@@ -112,7 +112,15 @@ describe 'Kirk::Server' do
 
 
   it "reloads the server" do
-    start randomized_app_path('config.ru')
+    path = randomized_app_path('config.ru')
+
+    start do
+      log :level => :warning
+
+      rack "#{path}" do
+        watch "REVISION"
+      end
+    end
 
     get '/'
     num = last_response.body

@@ -25,8 +25,6 @@ describe "Kirk bundler integration" do
     last_response.should have_body("required ActiveSupport\n" \
                                    "failed to load Rake\n")
 
-    sleep 2
-
     File.open bundled_app_path('Gemfile'), 'w' do |f|
       f.puts <<-GEMFILE
         source 'http://rubygems.org'
@@ -37,9 +35,7 @@ describe "Kirk bundler integration" do
       GEMFILE
     end
 
-    touch bundled_app_path('REVISION')
-
-    sleep 2
+    redeploy bundled_app_path('config.ru')
 
     get '/'
     last_response.should have_body("required ActiveSupport\n" \
@@ -62,9 +58,7 @@ describe "Kirk bundler integration" do
       GEMFILE
     end
 
-    touch bundled_app_path('REVISION')
-
-    sleep 2
+    redeploy bundled_app_path('config.ru')
 
     get '/'
     last_response.should have_body("required ActiveSupport\n" \

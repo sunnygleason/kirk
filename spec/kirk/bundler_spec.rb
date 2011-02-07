@@ -47,7 +47,6 @@ describe "Kirk bundler integration" do
   end
 
   it "doesn't take down the live application if something goes wrong when starting a redeploy" do
-    pending
     start bundled_app_path('config.ru')
 
     get '/'

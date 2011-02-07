@@ -39,8 +39,18 @@ module Kirk
 
       def deploy(deploy = nil)
         deploy ||= build_deploy
-        deploy.prepare
-        super(deploy)
+
+        if deploy
+          deploy.prepare
+          super(deploy)
+        end
+      end
+
+      def build_deploy
+        super
+      rescue Exception => e
+        Kirk.logger.warning "Redeploying `#{application_path}` failed: #{e.message}"
+        nil
       end
     end
   end

@@ -116,7 +116,13 @@ module Kirk
 
     def warmup_standby_deploy(app)
       queue = @info[app][:standby]
-      background { queue.put(app.build_deploy) } if queue.size == 0
+
+      return unless queue.size == 0
+
+      background do
+        deploy = app.build_deploy
+        queue.put deploy if deploy
+      end
     end
 
     def cleanup

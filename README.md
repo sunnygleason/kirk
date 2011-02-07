@@ -14,9 +14,9 @@ retarded ruby rack server out there.
 Here is a brief highlight of some of the features available.
 
 * 0 Downtime deploys: Deploy new versions of your rack application without
-  losing a single request. The basic strategy is similar to Passenger.
-  Touch a magic file in the application root and Kirk will reload the
-  application without dropping a single request... It's just magic.
+  losing a single request. This happens atomically so it will work even under
+  heavy load. Also, if the redeploy fails for some reason (the application fails
+  to boot), then the previous application remains live.
 
 * Request body streaming: Have a large request body to handle? Why wait until
   receiving the entire thing before starting the work?
@@ -66,6 +66,21 @@ Once you have Kirk configured, start it up with the following command:
     kirk -c /path/to/Kirkfile
 
 ... and you're off.
+
+### Redeploying
+
+As showed above, one way to trigger a redeploy is to specify a magic file to
+watch and then touch it. While this is simple, it doesn't give you any insight
+into the process of the redeploy. If the redeploy fails, there is no feedback.
+
+Another way to deploy is by running `kirk redeploy -R /path/to/app/config.ru`
+
+    $ kirk redeploy -R /path/to/app/config.ru
+    Waiting for response...
+    Redeploying application...
+    Redeploy complete.
+
+... that was easy.
 
 ### Daemonizing Kirk
 

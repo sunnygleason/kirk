@@ -1,0 +1,3 @@
+rack "../../echo_app/config.ru" do
+  listen 9092
+end

@@ -3,3 +3,4 @@ rack "../hello_world/config.ru" do
 end
 
 load "awesome/Kirkfile"
+load "*2/Kirk*"

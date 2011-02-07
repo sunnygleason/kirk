@@ -17,15 +17,19 @@ module Kirk
       }
     end
 
-    def load(path)
-      path = expand_path(path)
+    def load(glob)
+      glob = expand_path(glob)
 
-      with_root File.dirname(path) do
-        unless File.exist?(path)
-          raise MissingConfigFile, "config file `#{path}` does not exist"
+      files = Dir[glob].select { |f| File.file?(f) }
+
+      if files.empty?
+        raise MissingConfigFile, "glob `#{glob}` did not match any files"
+      end
+
+      files.each do |file|
+        with_root File.dirname(file) do
+          instance_eval(File.read(file), file)
         end
-
-        instance_eval(File.read(path), path)
       end
     end
 

@@ -233,6 +233,15 @@ describe 'Kirk::Server' do
     last_response.should have_body('Goodbye World')
   end
 
+  it "can load config files w/ a glob relative to the current file" do
+    kirkup kirked_up_path("Kirkfile")
+
+    host! 'localhost', 9092
+
+    get '/'
+    last_response.should receive_request_method('GET')
+  end
+
   it "can rackup applications that don't use config.ru as the rackup file" do
     start blacksheep_path('not_config.ru')
 

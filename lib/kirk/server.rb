@@ -36,6 +36,8 @@ module Kirk
     end
 
     def start
+      watcher.start if watcher
+
       @server = Jetty::Server.new.tap do |server|
         connectors.each do |conn|
           server.add_connector(conn)

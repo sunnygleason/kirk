@@ -4,14 +4,21 @@ module Kirk
 
     def initialize
       @apps, @magic_telephone, @workers = [], LinkedBlockingQueue.new, 0
-      @info   = {}
+      @info = {}
+    end
+
+    def start
+      raise "Watcher already started" if @thread
       @thread = Thread.new { run_loop }
       @thread.abort_on_exception = true
+      true
     end
 
     def stop
       @magic_telephone.put :halt
       @thread.join
+      @thread = nil
+      true
     end
 
     def life_cycle_started(app)

@@ -28,6 +28,10 @@ module Kirk
         config.application_path
       end
 
+      def rackup_path
+        config.rackup
+      end
+
       def last_modified
         mtimes = config.watch.map do |path|
           path = File.expand_path(path, application_path)

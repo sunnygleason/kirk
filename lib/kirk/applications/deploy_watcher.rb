@@ -92,11 +92,11 @@ module Kirk
       line = conn.gets.chomp
 
       if line =~ /^REDEPLOY (.*)$/
-        application_path = $1
-        app = @apps.find { |a| a.application_path == application_path }
+        rackup_path = $1
+        app = @apps.find { |a| a.rackup_path == rackup_path }
 
         unless app
-          conn.write "ERROR No application running at `#{application_path}`\n"
+          conn.write "ERROR No application racked up at `#{rackup_path}`\n"
           return
         end
 
@@ -157,7 +157,7 @@ module Kirk
         info = @info[app]
 
         if new_last_modified > info[:last_modified]
-          Kirk.logger.info("Reloading `#{app.application_path}`")
+          Kirk.logger.info("Reloading `#{app.rackup_path}`")
 
           # Redeploy the application
           redeploy(app)

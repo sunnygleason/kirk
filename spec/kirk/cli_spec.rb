@@ -20,7 +20,7 @@ describe "Kirk CLI interface" do
       last_response.should be_successful
       last_response.should have_body('Hello World')
 
-      kirk "redeploy -R #{hello_world_path}" do |c2|
+      kirk "redeploy -R #{hello_world_path('config.ru')}" do |c2|
         c2.stdout.gets.should =~ /Waiting for response.../
         c2.stdout.gets.should =~ /Redeploying application.../
         c2.stdout.gets.should =~ /Redeploy complete./

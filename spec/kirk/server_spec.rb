@@ -160,7 +160,7 @@ describe 'Kirk::Server' do
     get '/'
     num = last_response.body
 
-    redeploy(randomized_app_path).should == [
+    redeploy(randomized_app_path('config.ru')).should == [
       "Waiting for response...",
       "Redeploying application...",
       "Redeploy complete." ]
@@ -177,7 +177,7 @@ describe 'Kirk::Server' do
 
     redeploy('/some/app/is/missing').should == [
       'Waiting for response...',
-      '[ERROR] No application running at `/some/app/is/missing`' ]
+      '[ERROR] No application racked up at `/some/app/is/missing`' ]
 
     get '/'
     last_response.should have_body(num)
@@ -199,7 +199,7 @@ describe 'Kirk::Server' do
       RUBY
     end
 
-    redeploy(randomized_app_path).should == [
+    redeploy(randomized_app_path("config.ru")).should == [
       "Waiting for response...",
       "Redeploying application...",
       "[ERROR] Something went wrong" ]
@@ -212,7 +212,7 @@ describe 'Kirk::Server' do
       RUBY
     end
 
-    redeploy(randomized_app_path).should == [
+    redeploy(randomized_app_path("config.ru")).should == [
       "Waiting for response...",
       "Redeploying application...",
       "Redeploy complete." ]

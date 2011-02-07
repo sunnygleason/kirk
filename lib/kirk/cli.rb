@@ -41,7 +41,7 @@ module Kirk
     end
 
     def handle_redeploy
-      rackup = @options[:rackup] || "#{Dir.pwd}/config.ru"
+      rackup = File.expand_path(@options[:rackup] || "#{Dir.pwd}/config.ru")
       client = Applications::RedeployClient.new('/tmp/kirk.sock')
 
       unless File.exist?(rackup)

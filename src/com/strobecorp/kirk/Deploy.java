@@ -9,6 +9,7 @@ import org.jruby.embed.PathType;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.ScriptingContainer;
 import org.jruby.runtime.builtin.IRubyObject;
+import java.util.Map;
 
 public class Deploy {
 
@@ -45,7 +46,9 @@ public class Deploy {
   }
 
   private void initializeScriptingContext() {
-    this.context = new ScriptingContainer(LocalContextScope.SINGLETHREAD);
+    context = new ScriptingContainer(LocalContextScope.SINGLETHREAD);
+    context.setEnvironment(config.getEnvironment());
+
     this.bootstrapper = context.runScriptlet(
       PathType.ABSOLUTE, config.getBootstrapPath());
 

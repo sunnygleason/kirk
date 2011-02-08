@@ -272,4 +272,30 @@ describe 'Kirk::Server' do
     get '/'
     last_response.should have_body("umask: 18")
   end
+
+  it "can set the ENV for a specific application without it leaking over" do
+    path = reveal_env_path('config.ru')
+
+    start do
+      rack "#{path}" do
+        listen 9090
+        env :FOO => 'Bar', "BAZ" => :OMG
+      end
+
+      rack "#{path}" do
+        listen 9091
+      end
+    end
+
+    get '/'
+
+    ["FOO Bar", "BAZ OMG"].each do |line|
+      last_response.body.should include(line)
+    end
+
+    host! "127.0.0.1", 9091
+
+    get '/'
+    last_response.body.should_not =~ /FOO/
+  end
 end

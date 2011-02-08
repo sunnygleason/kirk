@@ -18,7 +18,9 @@ module SpecHelpers
       blk ||= lambda do
         log :level => :warning
 
-        rack app
+        rack app do
+          env :BUNDLE_BIN_PATH => nil, :BUNDLE_GEMFILE => nil
+        end
       end
 
       @server = Kirk::Server.build(&blk)

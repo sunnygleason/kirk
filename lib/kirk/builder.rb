@@ -56,6 +56,10 @@ module Kirk
       @current = nil
     end
 
+    def env(env)
+      @current.env.merge!(env)
+    end
+
     def hosts(*hosts)
       @current.hosts.concat hosts
     end

@@ -55,6 +55,10 @@ module SpecHelpers
     application_path('umask', *args)
   end
 
+  def reveal_env_path(*args)
+    application_path('reveal_env', *args)
+  end
+
   def tmp(*args)
     root.join('tmp', *args)
   end

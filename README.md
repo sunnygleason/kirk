@@ -51,6 +51,9 @@ we are going to put the following configuration file at `/path/to/Kirkfile`.
       # on. This defaults to "*"
       hosts "example.com", "*.example.org"
 
+      # Set arbitrary ENV variables
+      env :RAILS_ENV => "production"
+
       # Set the file that controls the redeploys. This is relative to
       # the applications root (the directory that the rackup file lives
       # in). Touch this file to redepoy the application.

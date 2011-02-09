@@ -33,6 +33,7 @@ module Kirk
   end
 
   require 'kirk/builder'
+  require 'kirk/client'
   require 'kirk/handler'
   require 'kirk/input_stream'
   require 'kirk/server'

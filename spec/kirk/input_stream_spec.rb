@@ -127,6 +127,17 @@ describe 'Kirk::InputStream' do
     end
   end
 
+  it "can rewind to the start then read a few bytes" do
+    with_input_stream do |input, writer|
+      writer << "zomgzomg"
+      writer.close
+
+      input.read
+      input.rewind
+      input.read(2).should == "zo"
+    end
+  end
+
   it "can seek ahead of what is currently read" do
     with_input_stream do |input, writer|
       writer << "zomgzomg"

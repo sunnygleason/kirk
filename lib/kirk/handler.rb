@@ -1,5 +1,8 @@
 module Kirk
   class Handler
+    import "java.util.zip.GZIPInputStream"
+    import "java.util.zip.InflaterInputStream"
+
     # Required environment variable keys
     REQUEST_METHOD = 'REQUEST_METHOD'.freeze
     SCRIPT_NAME    = 'SCRIPT_NAME'.freeze

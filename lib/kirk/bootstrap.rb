@@ -1,9 +1,6 @@
 require 'java'
 
 module Kirk
-  import 'java.util.zip.GZIPInputStream'
-  import 'java.util.zip.InflaterInputStream'
-
   class Bootstrap
     def warmup(application_path)
       Dir.chdir File.expand_path(application_path)

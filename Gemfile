@@ -2,6 +2,7 @@ source 'http://rubygems.org'
 
 gem 'kirk', :path => '.'
 
+gem 'jruby-openssl'
 gem 'activesupport'
 gem 'rake'
 gem 'rspec',        '~> 2.4.0'

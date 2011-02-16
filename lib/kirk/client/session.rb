@@ -5,8 +5,7 @@ class Kirk::Client
 
     def initialize
       @queue = LinkedBlockingQueue.new
-      @executor = ThreadPoolExecutor.new(thread_count, thread_count, 0, TimeUnit::SECONDS, @queue)
-      @connection = Connection.new
+      @client = Kirk::Client.new
       @requests_count = 0
       @responses = []
       yield(self)
@@ -21,12 +20,8 @@ class Kirk::Client
       request
     end
 
-    def thread_count
-      3
-    end
-
     def queue_request(request)
-      @connection.process(request)
+      @client.process(request)
       @requests_count += 1
     end
 

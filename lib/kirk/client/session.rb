@@ -33,7 +33,6 @@ class Kirk::Client
     def get_responses
       while @requests_count > 0
         @responses << @queue.take
-        puts 'cdcdc'
         @requests_count -= 1
       end
     end

@@ -11,7 +11,8 @@ class Kirk::Client
     end
 
     def process(request)
-      @client.send(request.exchange)
+      exchange = Exchange.from_request(request)
+      @client.send(exchange)
     end
   end
 end

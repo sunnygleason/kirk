@@ -1,5 +1,5 @@
 class Kirk::Client
-  class Exchange < HttpExchange
+  class Exchange < ContentExchange
     include java.util.concurrent.Callable
 
     def initialize(session, handler)
@@ -18,18 +18,16 @@ class Kirk::Client
     end
 
     def response
-      raise "Response is not ready yet" unless is_done
       @response = begin
-                    Response.new(get_content, get_status)
+                    Response.new(get_response_content, get_response_status)
                   end
     end
 
-    def is_canceled
-      get_status == STATUS_CANCELLED
-    end
-
-    def call
-      self
+    def self.from_request(request)
+      exchange = new(request.session, request.handler)
+      exchange.set_method(request.method)
+      exchange.set_url(request.url)
+      exchange
     end
   end
 end

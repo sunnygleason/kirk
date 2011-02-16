@@ -1,6 +1,6 @@
 class Kirk::Client
   class Response
-    attr_reader :status
+    attr_reader :status, :content
 
     def initialize(content, status)
       @content = content

@@ -1,5 +1,5 @@
 class Kirk::Client
-  class Session
+  class Group
 
     attr_reader :responses, :queue
 

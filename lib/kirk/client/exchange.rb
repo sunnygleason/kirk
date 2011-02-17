@@ -24,13 +24,13 @@ class Kirk::Client
     end
 
     def response
-      @response = begin
+      @response ||= begin
         Response.new(get_response_content, get_response_status)
       end
     end
 
     def self.from_request(request)
-      exchange = new(request.session, request.handler)
+      exchange = new(request.group, request.handler)
       exchange.set_method(request.method)
       exchange.set_url(request.url)
       exchange

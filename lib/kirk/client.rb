@@ -11,8 +11,8 @@ module Kirk
     import java.util.concurrent.ExecutorCompletionService
 
     class << self
-      def session
-        Session.new(&Proc.new)
+      def group
+        Group.new(&Proc.new)
       end
 
       def client
@@ -36,7 +36,7 @@ module Kirk
   end
 end
 
-require 'kirk/client/session'
+require 'kirk/client/group'
 require 'kirk/client/response'
 require 'kirk/client/request'
 require 'kirk/client/exchange'

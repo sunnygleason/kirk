@@ -11,27 +11,27 @@ describe 'Kirk::Client' do
     end
 
     it "performs simple GET" do
-      session = Kirk::Client.session do |s|
+      group = Kirk::Client.group do |s|
         s.request :GET, "http://localhost:9090/"
       end
 
-      session.should have(1).responses
-      session.responses.first.content.should == "/"
+      group.should have(1).responses
+      group.responses.first.content.should == "/"
     end
 
     it "performs more than one GET" do
-      session = Kirk::Client.session do |s|
+      group = Kirk::Client.group do |s|
         s.request :GET, "http://localhost:9090/foo"
         s.request :GET, "http://localhost:9090/bar"
       end
 
-      session.should have(2).responses
-      session.responses.map(&:content).sort.should == %w(/bar /foo)
+      group.should have(2).responses
+      group.responses.map(&:content).sort.should == %w(/bar /foo)
     end
   end
 
   it "allows to stream body" do
-    class MyHandler
+    handler = Class.new do
       def initialize(buffer)
         @buffer = buffer
       end
@@ -42,17 +42,43 @@ describe 'Kirk::Client' do
     end
 
     start(lambda do |env|
-            [ 200, { 'Content-Type' => 'text/plain' }, [ "a" * 10000 ] ]
-            end)
+      [ 200, { 'Content-Type' => 'text/plain' }, [ "a" * 10000 ] ]
+    end)
 
     @buffer = []
 
-    session = Kirk::Client.session do |s|
-      s.request :GET, "http://localhost:9090/", MyHandler.new(@buffer)
+    group = Kirk::Client.group do |s|
+      s.request :GET, "http://localhost:9090/", handler.new(@buffer)
     end
 
-    session.should have(1).responses
+    group.should have(1).responses
     @buffer.length.should be > 1
   end
 
+  context "callbacks" do
+    it "handles on_response_complete callback" do
+      handler = Class.new do
+        def initialize(buffer)
+          @buffer = buffer
+        end
+
+        def on_response_complete(response)
+          @buffer << response
+        end
+      end
+
+      start_default_app
+
+      @buffer = []
+      group = Kirk::Client.group do |s|
+        s.request :GET, "http://localhost:9090/", handler.new(@buffer)
+      end
+
+      @buffer.first.should == group.responses.first
+    end
+  end
+
+  def start_default_app
+    start(lambda { |env| [ 200, { 'Content-Type' => 'text/plain' }, [ "Hello" ] ] })
+  end
 end

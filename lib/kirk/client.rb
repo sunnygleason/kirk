@@ -11,7 +11,8 @@ module Kirk
     import java.util.concurrent.ExecutorCompletionService
 
     class << self
-      def group
+      def group(opts = {})
+        client.set_thread_pool if opts.delete(:thread_pool)
         group = Group.new
         group.start(&Proc.new)
         group

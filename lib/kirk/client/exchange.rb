@@ -23,6 +23,11 @@ class Kirk::Client
       super
     end
 
+    def onResponseHeader(name, value)
+      handle(:on_response_header, {name.to_s => value.to_s})
+      super
+    end
+
     def response
       @response ||= begin
         Response.new(get_response_content, get_response_status)

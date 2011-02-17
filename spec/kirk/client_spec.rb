@@ -76,6 +76,27 @@ describe 'Kirk::Client' do
 
       @buffer.first.should == group.responses.first
     end
+
+    it "handles on_response_header callback" do
+      handler = Class.new do
+        def initialize(buffer)
+          @buffer = buffer
+        end
+
+        def on_response_header(headers)
+          @buffer << headers
+        end
+      end
+
+      start_default_app
+
+      @buffer = []
+      group = Kirk::Client.group do |s|
+        s.request :GET, "http://localhost:9090/", handler.new(@buffer)
+      end
+
+      @buffer.first.should == {'Content-Type' => 'text/plain'}
+    end
   end
 
   def start_default_app

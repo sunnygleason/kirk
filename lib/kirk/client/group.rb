@@ -8,8 +8,12 @@ class Kirk::Client
       @client = Kirk::Client.new
       @requests_count = 0
       @responses = []
+    end
+
+    def start
       yield(self)
 
+      # TODO: do not block by default
       get_responses
     end
 

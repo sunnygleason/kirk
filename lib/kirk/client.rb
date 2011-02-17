@@ -12,7 +12,9 @@ module Kirk
 
     class << self
       def group
-        Group.new(&Proc.new)
+        group = Group.new
+        group.start(&Proc.new)
+        group
       end
 
       def client

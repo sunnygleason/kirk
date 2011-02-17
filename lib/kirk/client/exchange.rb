@@ -13,14 +13,20 @@ class Kirk::Client
     end
 
     def onResponseComplete
-      @session.queue.offer(response)
-      @handler.on_response_complete(response) if @handler
+      @session.queue.put(response)
+      handle(:on_response_complete, response)
+      super
+    end
+
+    def onResponseContent(content)
+      handle(:on_response_content, content)
+      super
     end
 
     def response
       @response = begin
-                    Response.new(get_response_content, get_response_status)
-                  end
+        Response.new(get_response_content, get_response_status)
+      end
     end
 
     def self.from_request(request)
@@ -28,6 +34,10 @@ class Kirk::Client
       exchange.set_method(request.method)
       exchange.set_url(request.url)
       exchange
+    end
+
+    def handle(method, *args)
+      @handler.send(method, *args) if @handler && @handler.respond_to?(method)
     end
   end
 end

@@ -8,22 +8,22 @@ class Kirk::Client
       super()
     end
 
-    def onException(ex)
+    def on_exception(ex)
       puts ex.inspect
     end
 
-    def onResponseComplete
+    def on_response_complete
       @session.queue.put(response)
       handle(:on_response_complete, response)
       super
     end
 
-    def onResponseContent(content)
+    def on_response_content(content)
       handle(:on_response_content, content)
       super
     end
 
-    def onResponseHeader(name, value)
+    def on_response_header(name, value)
       handle(:on_response_header, {name.to_s => value.to_s})
       super
     end
@@ -44,5 +44,10 @@ class Kirk::Client
     def handle(method, *args)
       @handler.send(method, *args) if @handler && @handler.respond_to?(method)
     end
+
+    alias onResponseComplete on_response_complete
+    alias onResponseContent  on_response_content
+    alias onResponseHeader   on_response_header
+    alias onException        on_exception
   end
 end

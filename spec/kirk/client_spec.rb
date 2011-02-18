@@ -16,7 +16,9 @@ describe 'Kirk::Client' do
       end
 
       group.should have(1).responses
-      parse_response(group.responses.first)["PATH_INFO"].should == "/"
+      response = parse_response(group.responses.first)
+      response["PATH_INFO"].should == "/"
+      response["REQUEST_METHOD"].should == "GET"
     end
 
     it "performs more than one GET" do
@@ -27,6 +29,16 @@ describe 'Kirk::Client' do
 
       group.should have(2).responses
       parse_responses(group.responses).map { |r| r["PATH_INFO"] }.sort.should == %w(/bar /foo)
+    end
+
+    it "performs POST request" do
+      group = Kirk::Client.group do |g|
+        g.request :POST, "http://localhost:9090/", {'Accept' => 'text/html'}
+      end
+
+      response = parse_response(group.responses.first)
+      response["HTTP_ACCEPT"].should == "text/html"
+      response["REQUEST_METHOD"].should == "POST"
     end
   end
 
@@ -48,9 +60,10 @@ describe 'Kirk::Client' do
     @buffer = []
 
     group = Kirk::Client.group do |s|
-      s.request :GET, "http://localhost:9090/", handler.new(@buffer)
+      s.request :GET, "http://localhost:9090/", {}, handler.new(@buffer)
     end
 
+    sleep(0.05)
     group.should have(1).responses
     @buffer.length.should be > 1
   end
@@ -71,9 +84,10 @@ describe 'Kirk::Client' do
 
       @buffer = []
       group = Kirk::Client.group do |s|
-        s.request :GET, "http://localhost:9090/", handler.new(@buffer)
+        s.request :GET, "http://localhost:9090/", {}, handler.new(@buffer)
       end
 
+      sleep(0.05)
       @buffer.first.should == group.responses.first
     end
 
@@ -92,7 +106,7 @@ describe 'Kirk::Client' do
 
       @buffer = []
       group = Kirk::Client.group do |s|
-        s.request :GET, "http://localhost:9090/", handler.new(@buffer)
+        s.request :GET, "http://localhost:9090/", {}, handler.new(@buffer)
       end
 
       sleep(0.05)

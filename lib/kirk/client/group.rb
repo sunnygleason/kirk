@@ -21,9 +21,9 @@ class Kirk::Client
       get_responses
     end
 
-    def request(method, url, handler = nil, headers = nil)
+    def request(method, url, headers = nil, handler = nil)
       url = URI.join(@host, url).to_s if @host
-      request = Request.new(self, method, url, handler, headers)
+      request = Request.new(self, method, url, headers, handler)
       yield request if block_given?
       queue_request(request)
       request

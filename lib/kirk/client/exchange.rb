@@ -38,6 +38,9 @@ class Kirk::Client
       exchange = new(request.group, request.handler)
       exchange.set_method(request.method)
       exchange.set_url(request.url)
+      request.headers.each do |name, value|
+        exchange.set_request_header(name, value)
+      end if request.headers
       exchange
     end
 

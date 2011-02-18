@@ -135,7 +135,7 @@ module Kirk
 
         # Set the new buffer limit to the amount that is going
         # to be read
-        @buffer.position(@read).limit(@read + missing)
+        @buffer.limit(@read + missing).position(@read)
 
         # Read into the buffer
         len = @io.read(@buffer)

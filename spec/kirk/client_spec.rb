@@ -124,6 +124,21 @@ describe 'Kirk::Client' do
       sleep(0.05)
       @buffer.first.should == {'Content-Type' => 'text/plain'}
     end
+
+    it "calls complete callback after finishing all the requests" do
+      start_default_app
+
+      @completed = false
+      group = Kirk::Client.group(:host => "localhost:9090") do |g|
+        g.get "/"
+        g.complete do
+          @completed = true
+        end
+      end
+
+      group.should have(1).responses
+      @completed.should be_true
+    end
   end
 
   it "allows to set thread_pool" do

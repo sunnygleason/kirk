@@ -20,7 +20,6 @@ class Kirk::Client
       @thread = Thread.new do
         yield(self)
 
-        # TODO: do not block by default
         get_responses
       end
 
@@ -29,6 +28,11 @@ class Kirk::Client
 
     def join
       @thread.join
+    end
+
+    def complete
+      @complete = Proc.new if block_given?
+      @complete
     end
 
     def request(method, url, headers = nil, handler = nil)
@@ -57,9 +61,15 @@ class Kirk::Client
         @responses << @queue.take
         @requests_count -= 1
       end
+
+      completed
     end
 
     private
+
+    def completed
+      complete.call if complete
+    end
 
     def fetch_host
       if @options[:host]

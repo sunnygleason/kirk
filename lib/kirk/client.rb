@@ -17,7 +17,7 @@ module Kirk
     end
 
     def group(opts = {})
-      group = Group.new(opts)
+      group = Group.new(self, opts)
       group.start(&Proc.new)
       group
     end

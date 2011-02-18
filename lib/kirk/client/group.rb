@@ -3,15 +3,15 @@ require 'uri'
 class Kirk::Client
   class Group
 
-    attr_reader :responses, :queue, :block
+    attr_reader :responses, :queue, :block, :client
     alias :block? :block
 
-    def initialize(options = {})
+    def initialize(client, options = {})
       @block = options.include?(:block) ? options[:block] : true
       @options = options
       fetch_host
       @queue = LinkedBlockingQueue.new
-      @client = Kirk::Client.new
+      @client = client
       @requests_count = 0
       @responses = []
     end

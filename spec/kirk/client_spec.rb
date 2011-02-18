@@ -166,6 +166,12 @@ describe 'Kirk::Client' do
     group.should have(1).responses
   end
 
+  it "passes self to group" do
+    client = Kirk::Client.new
+    group = client.group {}
+    group.client.should == client
+  end
+
   def start_default_app
     start(lambda { |env| [ 200, { 'Content-Type' => 'text/plain' }, [ "Hello" ] ] })
   end

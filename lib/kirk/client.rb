@@ -12,24 +12,27 @@ module Kirk
 
     class << self
       def group(opts = {})
-        client.set_thread_pool if opts.delete(:thread_pool)
-        group = Group.new
-        group.start(&Proc.new)
-        group
-      end
-
-      def client
-        @client ||= begin
-          client = HttpClient.new
-          client.set_connector_type(HttpClient::CONNECTOR_SELECT_CHANNEL)
-          client.start
-          client
-        end
+        new.group(opts, &Proc.new)
       end
     end
 
+    def group(opts = {})
+      group = Group.new(opts)
+      group.start(&Proc.new)
+      group
+    end
+
+    def initialize(opts = {})
+      client.set_thread_pool(opts.delete(:thread_pool)) if opts[:thread_pool]
+    end
+
     def client
-      self.class.client
+      @client ||= begin
+        client = HttpClient.new
+        client.set_connector_type(HttpClient::CONNECTOR_SELECT_CHANNEL)
+        client.start
+        client
+      end
     end
 
     def process(request)

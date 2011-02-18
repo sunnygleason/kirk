@@ -1,13 +1,13 @@
 require 'spec_helper'
 require 'kirk/client'
 
+import org.eclipse.jetty.util.thread.QueuedThreadPool
+
 describe 'Kirk::Client' do
-  describe "simple get" do
+
+  describe "requests" do
     before do
-      @env = nil
-      start(lambda do |env|
-        [ 200, { 'Content-Type' => 'text/plain'}, [ env['PATH_INFO'] ] ]
-      end)
+      start echo_app_path('config.ru')
     end
 
     it "performs simple GET" do
@@ -16,7 +16,7 @@ describe 'Kirk::Client' do
       end
 
       group.should have(1).responses
-      group.responses.first.content.should == "/"
+      parse_response(group.responses.first)["PATH_INFO"].should == "/"
     end
 
     it "performs more than one GET" do
@@ -26,7 +26,7 @@ describe 'Kirk::Client' do
       end
 
       group.should have(2).responses
-      group.responses.map(&:content).sort.should == %w(/bar /foo)
+      parse_responses(group.responses).map { |r| r["PATH_INFO"] }.sort.should == %w(/bar /foo)
     end
   end
 
@@ -95,11 +95,47 @@ describe 'Kirk::Client' do
         s.request :GET, "http://localhost:9090/", handler.new(@buffer)
       end
 
+      sleep(0.05)
       @buffer.first.should == {'Content-Type' => 'text/plain'}
     end
   end
 
+  it "allows to set thread_pool" do
+    thread_pool = QueuedThreadPool.new
+    client = Kirk::Client.new(:thread_pool => thread_pool)
+    client.client.get_thread_pool.should == thread_pool
+  end
+
+  it "allows to run group on instance" do
+    start_default_app
+
+    client = Kirk::Client.new
+    result = client.group do |g|
+      g.request :GET, "http://localhost:9090/"
+    end
+
+    result.responses.first.body.should == "Hello"
+  end
+
+  it "allows to set host for group" do
+    start_default_app
+
+    group = Kirk::Client.group(:host => "localhost:9090") do |g|
+      g.request :GET, "/"
+    end
+
+    group.responses.first.body.should == "Hello"
+  end
+
   def start_default_app
     start(lambda { |env| [ 200, { 'Content-Type' => 'text/plain' }, [ "Hello" ] ] })
+  end
+
+  def parse_response(response)
+    Marshal.load(response.body)
+  end
+
+  def parse_responses(responses)
+    responses.map { |r| parse_response(r) }
   end
 end

@@ -3,9 +3,11 @@ require 'uri'
 class Kirk::Client
   class Group
 
-    attr_reader :responses, :queue
+    attr_reader :responses, :queue, :block
+    alias :block? :block
 
     def initialize(options = {})
+      @block = options.include?(:block) ? options[:block] : true
       @options = options
       fetch_host
       @queue = LinkedBlockingQueue.new
@@ -15,10 +17,18 @@ class Kirk::Client
     end
 
     def start
-      yield(self)
+      @thread = Thread.new do
+        yield(self)
 
-      # TODO: do not block by default
-      get_responses
+        # TODO: do not block by default
+        get_responses
+      end
+
+      join if block?
+    end
+
+    def join
+      @thread.join
     end
 
     def request(method, url, headers = nil, handler = nil)

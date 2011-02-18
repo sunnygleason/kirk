@@ -153,6 +153,19 @@ describe 'Kirk::Client' do
     group.responses.first.body.should == "Hello"
   end
 
+  it "allows to avoid blocking" do
+    start(lambda { |env| sleep(0.1); [ 200, {}, 'Hello' ] })
+
+    group = Kirk::Client.group(:host => "localhost:9090", :block => false) do |g|
+      g.get "/"
+    end
+
+    group.should have(0).responses
+
+    group.join
+    group.should have(1).responses
+  end
+
   def start_default_app
     start(lambda { |env| [ 200, { 'Content-Type' => 'text/plain' }, [ "Hello" ] ] })
   end

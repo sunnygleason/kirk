@@ -29,6 +29,14 @@ class Kirk::Client
       request
     end
 
+    %w/get post put delete/.each do |method|
+      class_eval <<-RUBY
+        def #{method}(url, headers = nil, handler = nil)
+          request(:#{method.upcase}, url, headers, handler)
+        end
+      RUBY
+    end
+
     def queue_request(request)
       @client.process(request)
       @requests_count += 1

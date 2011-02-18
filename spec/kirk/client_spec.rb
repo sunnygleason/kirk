@@ -10,6 +10,18 @@ describe 'Kirk::Client' do
       start echo_app_path('config.ru')
     end
 
+    it "allows to use simplified syntax" do
+      group = Kirk::Client.group(:host => "localhost:9090") do |g|
+        g.get    '/'
+        g.put    '/'
+        g.post   '/'
+        g.delete '/'
+      end
+
+      responses = parse_responses(group.responses)
+      responses.map {|r| r["REQUEST_METHOD"] }.sort.should == ["DELETE", "GET", "POST", "PUT"]
+    end
+
     it "performs simple GET" do
       group = Kirk::Client.group do |s|
         s.request :GET, "http://localhost:9090/"

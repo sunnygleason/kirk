@@ -33,10 +33,10 @@ module Kirk
     autoload :RedeployClient, 'kirk/applications/redeploy_client'
   end
 
-  require 'kirk/builder'
+  require 'kirk/server/builder'
   require 'kirk/client'
-  require 'kirk/handler'
-  require 'kirk/input_stream'
+  require 'kirk/server/handler'
+  require 'kirk/server/input_stream'
   require 'kirk/server'
 
   # Configure the logger

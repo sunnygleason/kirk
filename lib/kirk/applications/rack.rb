@@ -7,7 +7,7 @@ module Kirk
     class Rack < Jetty::AbstractHandler
       def self.new(app)
         inst     = super()
-        inst.app = Handler.new(app)
+        inst.app = Server::Handler.new(app)
         inst
       end
 

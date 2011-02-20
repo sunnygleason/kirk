@@ -1,8 +1,7 @@
 require 'spec_helper'
-require 'openssl'
-require "kirk/input_stream"
+require "kirk/server/input_stream"
 
-describe 'Kirk::InputStream' do
+describe 'Kirk::Server::InputStream' do
 
   CHUNK_SIZE    =   4 * 1_024
   GIBBERISH_LEN = 256 * 1_024
@@ -10,7 +9,7 @@ describe 'Kirk::InputStream' do
 
   def with_input_stream
     r, w  = IO.pipe
-    input = Kirk::InputStream.new(r.to_inputstream)
+    input = Kirk::Server::InputStream.new(r.to_inputstream)
     yield input, w
     input.read # clear the pipes
     @thread.join if @thread

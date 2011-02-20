@@ -8,9 +8,10 @@ module Kirk
   end
 
   require 'java'
+  require 'kirk/common'
+  require 'kirk/version'
   require 'kirk/native'
   require 'kirk/jetty'
-  require 'kirk/version'
 
   import "java.util.concurrent.LinkedBlockingQueue"
   import "java.util.concurrent.TimeUnit"
@@ -34,7 +35,6 @@ module Kirk
 
   require 'kirk/builder'
   require 'kirk/client'
-  require 'kirk/common'
   require 'kirk/handler'
   require 'kirk/input_stream'
   require 'kirk/server'

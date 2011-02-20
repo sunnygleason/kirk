@@ -6,7 +6,7 @@ class Kirk::Client
     attr_reader :responses, :queue, :block, :client
     alias :block? :block
 
-    def initialize(client, options = {})
+    def initialize(client = Kirk::Client.new, options = {})
       @block = options.include?(:block) ? options[:block] : true
       @options = options
       fetch_host

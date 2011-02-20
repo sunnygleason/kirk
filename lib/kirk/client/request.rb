@@ -1,13 +1,29 @@
 class Kirk::Client
   class Request
-    attr_reader :method, :url, :handler, :group, :headers
+    attr_reader :group
 
-    def initialize(group, method, url, headers, handler)
-      @group = group
-      @method  = method.to_s.upcase
-      @url     = url
-      @handler = handler
-      @headers = headers
+    def initialize(group, method = nil, url = nil, headers = nil, handler = nil)
+      @group   = group
+      method(method)
+      url(url)
+      handler(handler)
+      headers(headers)
+
+      yield(self) if block_given?
+    end
+
+    %w/url headers handler body/.each do |method|
+      class_eval <<-RUBY
+        def #{method}(#{method} = nil)
+          @#{method} = #{method} if #{method}
+          @#{method}
+        end
+      RUBY
+    end
+
+    def method(method = nil)
+      @method = method.to_s.upcase if method
+      @method
     end
   end
 end

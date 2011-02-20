@@ -1,10 +1,7 @@
 module Kirk
   class Client
-    import org.eclipse.jetty.client.HttpClient
-    import org.eclipse.jetty.client.HttpExchange
     import java.net.InetSocketAddress
     import java.util.concurrent.LinkedBlockingQueue
-    import org.eclipse.jetty.client.ContentExchange
     import java.util.concurrent.AbstractExecutorService
     import java.util.concurrent.TimeUnit
     import java.util.concurrent.ThreadPoolExecutor
@@ -29,8 +26,8 @@ module Kirk
 
     def client
       @client ||= begin
-        client = HttpClient.new
-        client.set_connector_type(HttpClient::CONNECTOR_SELECT_CHANNEL)
+        client = Jetty::HttpClient.new
+        client.set_connector_type(Jetty::HttpClient::CONNECTOR_SELECT_CHANNEL)
         client.start
         client
       end

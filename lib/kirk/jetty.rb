@@ -10,6 +10,7 @@ module Kirk
     # Gimme Jetty
     import "org.eclipse.jetty.client.HttpClient"
     import "org.eclipse.jetty.client.HttpExchange"
+    import "org.eclipse.jetty.client.ContentExchange"
 
     import "org.eclipse.jetty.server.nio.SelectChannelConnector"
     import "org.eclipse.jetty.server.handler.AbstractHandler"

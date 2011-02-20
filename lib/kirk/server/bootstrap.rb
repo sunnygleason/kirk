@@ -45,7 +45,7 @@ module Kirk
     end
 
     def add_kirk_to_load_path
-      $:.unshift File.expand_path('../..', __FILE__)
+      $:.unshift File.expand_path('../../..', __FILE__)
     end
 
     def load_rack

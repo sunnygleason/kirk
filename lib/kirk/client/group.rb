@@ -35,10 +35,10 @@ class Kirk::Client
       @complete
     end
 
-    def request(method, url, handler = nil, headers = nil)
-      url = URI.join(@host, url).to_s if @host
+    def request(method = nil, url = nil, handler = nil, headers = {})
       request = Request.new(self, method, url, handler, headers)
       yield request if block_given?
+      request.url URI.join(@host, request.url).to_s if @host
       queue_request(request)
       request
     end

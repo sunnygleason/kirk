@@ -10,6 +10,38 @@ describe 'Kirk::Client' do
       start echo_app_path('config.ru')
     end
 
+    it "allows to pass block for request" do
+      handler = Class.new do
+        def initialize(buffer)
+          @buffer = buffer
+        end
+
+        def on_response_complete(response)
+          @buffer << response
+        end
+      end
+
+      @buffer = []
+      group = Kirk::Client.group(:host => "localhost:9090") do |g|
+        body = "foobar"
+
+        g.request do |r|
+          r.method  :post
+          r.url     "/foo"
+          r.handler handler.new(@buffer)
+          r.headers "Accept" => "text/plain"
+          r.body    body
+        end
+      end
+
+      response = parse_response(group.responses.first)
+      response["PATH_INFO"].should == "/foo"
+      response["HTTP_ACCEPT"].should == "text/plain"
+      response["REQUEST_METHOD"].should == "POST"
+      response["rack.input"].should == "foobar"
+      @buffer.should == group.responses
+    end
+
     it "allows to use simplified syntax" do
       group = Kirk::Client.group(:host => "localhost:9090") do |g|
         g.get    '/'

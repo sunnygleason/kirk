@@ -34,7 +34,8 @@ describe "Kirk's Rack handler" do
       'HTTP_ACCEPT'       => "*/*",
       'HTTP_CONNECTION'   => 'close',
 
-      'rack.input'        => ''
+      'rack.input'        => '',
+      'kirk.sub_process?' => true
     )
   end
 

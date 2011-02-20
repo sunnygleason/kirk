@@ -1,6 +1,8 @@
 require 'java'
 
 module Kirk
+  SUB_PROCESS = true
+
   import 'java.util.zip.GZIPInputStream'
   import 'java.util.zip.InflaterInputStream'
 
@@ -53,6 +55,7 @@ module Kirk
 
     def load_kirk
       require 'kirk/version'
+      require 'kirk/common'
       require 'kirk/input_stream'
       require 'kirk/handler'
     end

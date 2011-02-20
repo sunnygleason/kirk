@@ -34,6 +34,7 @@ module Kirk
 
   require 'kirk/builder'
   require 'kirk/client'
+  require 'kirk/common'
   require 'kirk/handler'
   require 'kirk/input_stream'
   require 'kirk/server'

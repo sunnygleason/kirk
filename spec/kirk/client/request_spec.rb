@@ -5,7 +5,7 @@ describe Kirk::Client::Request do
     handler = Object.new
     group   = Kirk::Client::Group.new
     request = Kirk::Client::Request.new(group, :GET, "http://localhost",
-                                        {'Accept' => 'text/javascript'}, handler)
+                                        handler, {'Accept' => 'text/javascript'})
 
     request.method.should  == "GET"
     request.url.should     == "http://localhost"

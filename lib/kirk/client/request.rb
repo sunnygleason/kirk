@@ -2,7 +2,7 @@ class Kirk::Client
   class Request
     attr_reader :group
 
-    def initialize(group, method = nil, url = nil, headers = nil, handler = nil)
+    def initialize(group, method = nil, url = nil, handler = nil, headers = {})
       @group   = group
       method(method)
       url(url)

@@ -45,7 +45,7 @@ describe 'Kirk::Client' do
 
     it "performs POST request" do
       group = Kirk::Client.group do |g|
-        g.request :POST, "http://localhost:9090/", {'Accept' => 'text/html'}
+        g.request :POST, "http://localhost:9090/", nil, {'Accept' => 'text/html'}
       end
 
       response = parse_response(group.responses.first)
@@ -72,7 +72,7 @@ describe 'Kirk::Client' do
     @buffer = []
 
     group = Kirk::Client.group do |s|
-      s.request :GET, "http://localhost:9090/", {}, handler.new(@buffer)
+      s.request :GET, "http://localhost:9090/", handler.new(@buffer)
     end
 
     sleep(0.05)
@@ -96,7 +96,7 @@ describe 'Kirk::Client' do
 
       @buffer = []
       group = Kirk::Client.group do |s|
-        s.request :GET, "http://localhost:9090/", {}, handler.new(@buffer)
+        s.request :GET, "http://localhost:9090/", handler.new(@buffer)
       end
 
       sleep(0.05)
@@ -118,7 +118,7 @@ describe 'Kirk::Client' do
 
       @buffer = []
       group = Kirk::Client.group do |s|
-        s.request :GET, "http://localhost:9090/", {}, handler.new(@buffer)
+        s.request :GET, "http://localhost:9090/", handler.new(@buffer)
       end
 
       sleep(0.05)

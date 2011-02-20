@@ -1,10 +1,11 @@
 class Kirk::Client
   class Response
-    attr_reader :status, :body
+    attr_reader :status, :body, :headers
 
-    def initialize(body, status)
-      @body = body
+    def initialize(body, status, headers)
+      @body    = body
       @status  = status
+      @headers = headers
     end
   end
 end

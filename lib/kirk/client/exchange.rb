@@ -5,6 +5,7 @@ class Kirk::Client
     def initialize(session, handler)
       @handler = handler
       @session = session
+      @headers = {}
       super()
     end
 
@@ -24,13 +25,14 @@ class Kirk::Client
     end
 
     def on_response_header(name, value)
+      @headers[name.to_s] = value.to_s
       handle(:on_response_header, {name.to_s => value.to_s})
       super
     end
 
     def response
       @response ||= begin
-        Response.new(get_response_content, get_response_status)
+        Response.new(get_response_content, get_response_status, @headers)
       end
     end
 

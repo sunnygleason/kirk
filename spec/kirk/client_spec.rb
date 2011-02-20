@@ -86,6 +86,14 @@ describe 'Kirk::Client' do
     end
   end
 
+  it "fetches all the headers" do
+    headers = { 'Content-Type' => 'text/plain', 'X-FooBar' => "zomg" }
+    start(lambda { |env| [ 200, headers, [ "Hello" ] ] })
+
+    headers.to_a.sort { |a, b| a.first <=> b.first }.should ==
+      [['Content-Type', 'text/plain'], ['X-FooBar', 'zomg']]
+  end
+
   it "allows to stream body" do
     handler = Class.new do
       def initialize(buffer)

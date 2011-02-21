@@ -4,6 +4,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.jruby.embed.PathType;
 import org.jruby.embed.LocalContextScope;
@@ -16,7 +17,7 @@ public class Deploy {
   private ApplicationConfig  config;
   private ScriptingContainer context;
   private Object             bootstrapper;
-  private Object             handler;
+  private Handler            handler;
   private String             key;
 
   public Deploy(ApplicationConfig config) {
@@ -25,14 +26,14 @@ public class Deploy {
   }
 
   public void prepare() {
-    this.handler = context.callMethod(bootstrapper, "run",
-      config.getRackupPath());
+    this.handler = (Handler) context.callMethod(bootstrapper,
+      "run", config.getRackupPath());
   }
 
   public void handle(String target, Request baseRequest,
       HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
-    context.callMethod(handler, "handle", target, baseRequest, request, response);
+    handler.handle(target, baseRequest, request, response);
   }
 
   public String getKey() {

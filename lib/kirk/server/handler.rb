@@ -1,6 +1,6 @@
 module Kirk
   class Server
-    class Handler
+    class Handler < Jetty::AbstractHandler
       import 'java.util.zip.GZIPInputStream'
       import 'java.util.zip.InflaterInputStream'
 
@@ -48,9 +48,13 @@ module Kirk
 
       CONTENT_LENGTH_TYPE_REGEXP = /^Content-(?:Type|Length)$/i
 
-      def initialize(app)
-        @app = app
+      def self.new(app)
+        inst = super()
+        inst.app = app
+        inst
       end
+
+      attr_accessor :app
 
       def handle(target, base_request, request, response)
         begin

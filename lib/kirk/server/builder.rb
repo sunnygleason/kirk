@@ -134,7 +134,7 @@ module Kirk
       end
 
       def new_config
-        Applications::Config.new.tap do |config|
+        ApplicationConfig.new.tap do |config|
           config.listen         = '0.0.0.0:9090'
           config.watch          = [ ]
           config.bootstrap_path = File.expand_path('../bootstrap.rb', __FILE__)

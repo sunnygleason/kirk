@@ -25,10 +25,6 @@ module Kirk
     import "com.strobecorp.kirk.LogFormatter"
   end
 
-  module Applications
-    autoload :Config, 'kirk/applications/config'
-  end
-
   require 'kirk/server/builder'
   require 'kirk/client'
   require 'kirk/server/handler'

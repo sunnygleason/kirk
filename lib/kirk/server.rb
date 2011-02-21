@@ -1,8 +1,11 @@
 module Kirk
   class Server
     require 'kirk/server/application_config'
+    require 'kirk/server/builder'
     require 'kirk/server/deploy_watcher'
+    require 'kirk/server/handler'
     require 'kirk/server/hot_deployable'
+    require 'kirk/server/input_stream'
     require 'kirk/server/redeploy_client'
 
     def self.build(file = nil, &blk)

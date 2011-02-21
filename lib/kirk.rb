@@ -25,11 +25,8 @@ module Kirk
     import "com.strobecorp.kirk.LogFormatter"
   end
 
-  require 'kirk/server/builder'
-  require 'kirk/client'
-  require 'kirk/server/handler'
-  require 'kirk/server/input_stream'
-  require 'kirk/server'
+  autoload :Client, 'kirk/client'
+  autoload :Server, 'kirk/server'
 
   # Configure the logger
   def self.logger

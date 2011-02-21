@@ -3,18 +3,24 @@ require 'uri'
 module Kirk
   class Client
     class Group
-
-      attr_reader :responses, :queue, :block, :client
-      alias :block? :block
+      attr_reader :client, :host, :options, :responses, :queue
 
       def initialize(client = Client.new, options = {})
-        @block = options.include?(:block) ? options[:block] : true
         @options = options
-        fetch_host
-        @queue = LinkedBlockingQueue.new
-        @client = client
+        @client  = client
+        @queue   = LinkedBlockingQueue.new
+
         @requests_count = 0
-        @responses = []
+        @responses      = []
+
+        if @options[:host]
+          @host = @options.delete(:host).chomp('/')
+          @host = "http://#{@host}" unless @host =~ /^https?:\/\//
+        end
+      end
+
+      def block?
+        options.key?(:block) ? options[:block] : true
       end
 
       def start
@@ -39,7 +45,7 @@ module Kirk
       def request(method = nil, url = nil, handler = nil, headers = {})
         request = Request.new(self, method, url, handler, headers)
         yield request if block_given?
-        request.url URI.join(@host, request.url).to_s if @host
+        request.url URI.join(host, request.url).to_s if host
         queue_request(request)
         request
       end
@@ -70,13 +76,6 @@ module Kirk
 
       def completed
         complete.call if complete
-      end
-
-      def fetch_host
-        if @options[:host]
-          @host = @options.delete(:host).chomp('/')
-          @host = "http://#{@host}" unless @host =~ /^https?:\/\//
-        end
       end
     end
   end

@@ -24,21 +24,17 @@ module Kirk
       end
 
       def start
-        @thread = Thread.new do
-          yield(self)
-
-          get_responses
-        end
-
+        ret = yield self
         join if block?
+        ret
       end
 
       def join
-        @thread.join
+        get_responses
       end
 
-      def complete
-        @complete = Proc.new if block_given?
+      def complete(&blk)
+        @complete = blk if blk
         @complete
       end
 

@@ -13,6 +13,9 @@ module Kirk
   require 'kirk/native'
   require 'kirk/jetty'
 
+  autoload :Client, 'kirk/client'
+  autoload :Server, 'kirk/server'
+
   import "java.util.concurrent.LinkedBlockingQueue"
   import "java.util.concurrent.TimeUnit"
   import "java.util.logging.Logger"
@@ -25,15 +28,16 @@ module Kirk
     import "com.strobecorp.kirk.LogFormatter"
   end
 
-  autoload :Client, 'kirk/client'
-  autoload :Server, 'kirk/server'
-
   # Configure the logger
   def self.logger
     @logger ||= begin
       logger = Logger.get_logger("org.eclipse.jetty.util.log")
-      logger.set_use_parent_handlers(false)
-      logger.add_handler logger_handler
+
+      unless sub_process?
+        logger.set_use_parent_handlers(false)
+        logger.add_handler logger_handler
+      end
+
       logger
     end
   end

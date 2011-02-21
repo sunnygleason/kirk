@@ -1,12 +1,12 @@
 module Kirk
   class Server
-    require 'kirk/server/application_config'
-    require 'kirk/server/builder'
-    require 'kirk/server/deploy_watcher'
-    require 'kirk/server/handler'
-    require 'kirk/server/hot_deployable'
-    require 'kirk/server/input_stream'
-    require 'kirk/server/redeploy_client'
+    autoload :ApplicationConfig,  'kirk/server/application_config'
+    autoload :Builder,            'kirk/server/builder'
+    autoload :DeployWatcher,      'kirk/server/deploy_watcher'
+    autoload :Handler,            'kirk/server/handler'
+    autoload :HotDeployable,      'kirk/server/hot_deployable'
+    autoload :InputStream,        'kirk/server/input_stream'
+    autoload :RedeployClient,     'kirk/server/redeploy_client'
 
     def self.build(file = nil, &blk)
       root    = File.dirname(file) if file

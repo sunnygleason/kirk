@@ -4,6 +4,10 @@ module Kirk
       import 'java.util.zip.GZIPInputStream'
       import 'java.util.zip.InflaterInputStream'
 
+      # Trigger the autoload so that the first access to the class
+      # does not happen in a thread.
+      InputStream
+
       # Required environment variable keys
       REQUEST_METHOD = 'REQUEST_METHOD'.freeze
       SCRIPT_NAME    = 'SCRIPT_NAME'.freeze

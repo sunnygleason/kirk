@@ -14,7 +14,7 @@ module Kirk
         @current = nil
         @configs = []
         @options = {
-          :watcher => Applications::DeployWatcher.new("/tmp/kirk.sock")
+          :watcher => DeployWatcher.new("/tmp/kirk.sock")
         }
       end
 

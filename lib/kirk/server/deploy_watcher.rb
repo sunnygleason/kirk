@@ -1,7 +1,7 @@
 require 'socket'
 
 module Kirk
-  class Applications::DeployWatcher
+  class Server::DeployWatcher
     include Jetty::LifeCycle::Listener
 
     def initialize(unix_socket_path = nil)

@@ -1,5 +1,7 @@
 module Kirk
   class Server
+    require 'kirk/server/deploy_watcher'
+
     def self.build(file = nil, &blk)
       root    = File.dirname(file) if file
       builder = Builder.new(root)

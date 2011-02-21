@@ -7,8 +7,17 @@ module Kirk
     require 'kirk/client/request'
     require 'kirk/client/exchange'
 
-    def self.group(opts = {})
-      new.group(opts, &Proc.new)
+    def self.client
+      @client ||= new
+    end
+
+    def self.stop
+      @client.stop if @client
+      @client = nil
+    end
+
+    def self.group(opts = {}, &blk)
+      client.group(opts, &blk)
     end
 
     def group(opts = {}, &blk)
@@ -18,12 +27,13 @@ module Kirk
     end
 
     def initialize(opts = {})
-      client.set_thread_pool(opts.delete(:thread_pool)) if opts[:thread_pool]
+      @options = opts
     end
 
     def client
       @client ||= Jetty::HttpClient.new.tap do |client|
         client.set_connector_type(Jetty::HttpClient::CONNECTOR_SELECT_CHANNEL)
+        client.set_thread_pool(thread_pool) if thread_pool
         client.start
       end
     end
@@ -31,6 +41,16 @@ module Kirk
     def process(request)
       exchange = Exchange.from_request(request)
       client.send(exchange)
+    end
+
+    def stop
+      client.stop
+    end
+
+  private
+
+    def thread_pool
+      @options[:thread_pool]
     end
   end
 end

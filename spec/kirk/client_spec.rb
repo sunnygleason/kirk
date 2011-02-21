@@ -187,6 +187,7 @@ describe 'Kirk::Client' do
     thread_pool = QueuedThreadPool.new
     client = Kirk::Client.new(:thread_pool => thread_pool)
     client.client.get_thread_pool.should == thread_pool
+    client.stop
   end
 
   it "allows to run group on instance" do

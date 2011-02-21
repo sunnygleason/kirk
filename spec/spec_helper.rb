@@ -22,6 +22,7 @@ RSpec.configure do |config|
 
   config.after :each do
     File.umask(ORIGINAL_UMASK)
+    Kirk::Client.stop
     @server.stop if @server
     @server = nil
   end

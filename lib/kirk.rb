@@ -15,8 +15,14 @@ module Kirk
   autoload :Native, 'kirk/native'
   autoload :Server, 'kirk/server'
 
+  import "java.net.InetSocketAddress"
+
+  import "java.util.concurrent.AbstractExecutorService"
+  import "java.util.concurrent.ExecutorCompletionService"
   import "java.util.concurrent.LinkedBlockingQueue"
   import "java.util.concurrent.TimeUnit"
+  import "java.util.concurrent.ThreadPoolExecutor"
+
   import "java.util.logging.Logger"
   import "java.util.logging.Level"
   import "java.util.logging.ConsoleHandler"

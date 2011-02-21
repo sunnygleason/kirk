@@ -2,13 +2,6 @@ require 'kirk'
 
 module Kirk
   class Client
-    import java.net.InetSocketAddress
-    import java.util.concurrent.LinkedBlockingQueue
-    import java.util.concurrent.AbstractExecutorService
-    import java.util.concurrent.TimeUnit
-    import java.util.concurrent.ThreadPoolExecutor
-    import java.util.concurrent.ExecutorCompletionService
-
     class << self
       def group(opts = {})
         new.group(opts, &Proc.new)

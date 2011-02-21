@@ -123,18 +123,18 @@ module Kirk
 
         else
 
-          read_chunk_from_mem(missing, string)
+          read_chunk_from_mem(size, string, missing)
 
         end
       end
 
-      def read_chunk_from_mem(missing, string)
+      def read_chunk_from_mem(size, string, missing)
         # We gonna have to read from the input stream
         if missing > 0 && !@eof
 
           # Set the new buffer limit to the amount that is going
           # to be read
-          @buffer.position(@read).limit(@read + missing)
+          @buffer.limit(@read + missing).position(@read)
 
           # Read into the buffer
           len = @io.read(@buffer)
@@ -154,8 +154,11 @@ module Kirk
 
         end
 
+        limit = @position + size
+        limit = @read if @read < limit
+
         # Now move the amount read into the string
-        @buffer.position(@position).limit(@read)
+        @buffer.position(@position).limit(limit)
 
         append_buffer_to_string(@buffer, string)
       end

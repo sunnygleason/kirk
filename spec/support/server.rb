@@ -31,7 +31,7 @@ module SpecHelpers
 
   def redeploy(path)
     msgs = []
-    Kirk::Applications::RedeployClient.redeploy(
+    Kirk::Server::RedeployClient.redeploy(
       '/tmp/kirk.sock', path) { |l| msgs << l }
     msgs
   end

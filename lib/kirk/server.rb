@@ -1,6 +1,7 @@
 module Kirk
   class Server
     require 'kirk/server/deploy_watcher'
+    require 'kirk/server/redeploy_client'
 
     def self.build(file = nil, &blk)
       root    = File.dirname(file) if file

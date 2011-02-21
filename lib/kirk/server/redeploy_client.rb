@@ -1,7 +1,7 @@
 require 'socket'
 
 module Kirk
-  class Applications::RedeployClient
+  class Server::RedeployClient
     def self.redeploy(socket, path, &blk)
       new(socket).redeploy(path, &blk)
     end

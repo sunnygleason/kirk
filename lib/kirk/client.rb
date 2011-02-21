@@ -11,10 +11,10 @@ module Kirk
       new.group(opts, &Proc.new)
     end
 
-    def group(opts = {})
-      group = Group.new(self, opts)
-      group.start(&Proc.new)
-      group
+    def group(opts = {}, &blk)
+      Group.new(self, opts).tap do |group|
+        group.start(&blk)
+      end
     end
 
     def initialize(opts = {})

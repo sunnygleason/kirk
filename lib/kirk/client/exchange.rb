@@ -53,6 +53,7 @@ module Kirk
         @handler.send(method, *args) if @handler && @handler.respond_to?(method)
       end
 
+      # Implement Java API
       alias onResponseComplete on_response_complete
       alias onResponseContent  on_response_content
       alias onResponseHeader   on_response_header

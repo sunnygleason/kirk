@@ -66,7 +66,7 @@ module Kirk
         completed
       end
 
-      private
+    private
 
       def completed
         complete.call if complete

@@ -22,11 +22,9 @@ module Kirk
     end
 
     def client
-      @client ||= begin
-        client = Jetty::HttpClient.new
+      @client ||= Jetty::HttpClient.new.tap do |client|
         client.set_connector_type(Jetty::HttpClient::CONNECTOR_SELECT_CHANNEL)
         client.start
-        client
       end
     end
 

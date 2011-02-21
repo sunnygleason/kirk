@@ -85,7 +85,7 @@ module Kirk
               ctx.set_virtual_hosts(c.hosts)
             end
 
-            application = Applications::HotDeployable.new(c)
+            application = HotDeployable.new(c)
             application.add_watcher(watcher)
 
             ctx.set_connector_names [c.listen]

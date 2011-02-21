@@ -26,8 +26,7 @@ module Kirk
   end
 
   module Applications
-    autoload :Config,         'kirk/applications/config'
-    autoload :HotDeployable,  'kirk/applications/hot_deployable'
+    autoload :Config, 'kirk/applications/config'
   end
 
   require 'kirk/server/builder'

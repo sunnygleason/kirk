@@ -86,6 +86,16 @@ describe 'Kirk::Client' do
       response["REQUEST_METHOD"].should == "POST"
       response["rack.input"].should     == "zomg"
     end
+
+    it "allows to pass body as IO" do
+      body = StringIO.new "zomg"
+      group = Kirk::Client.group do |g|
+        g.request :POST, "http://localhost:9090/", nil, body
+      end
+
+      response = parse_response(group.responses.first)
+      response["rack.input"].should == "zomg"
+    end
   end
 
   it "fetches all the headers" do

@@ -30,7 +30,7 @@ module Kirk
       if Jetty::AbstractHandler === handler
         @handler = handler
       elsif handler.respond_to?(:call)
-        @handler = Applications::Rack.new(handler)
+        @handler = Handler.new(handler)
       else
         raise "#{handler.inspect} is not a valid Rack application"
       end

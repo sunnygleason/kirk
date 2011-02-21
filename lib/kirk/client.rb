@@ -2,10 +2,13 @@ require 'kirk'
 
 module Kirk
   class Client
-    class << self
-      def group(opts = {})
-        new.group(opts, &Proc.new)
-      end
+    require 'kirk/client/group'
+    require 'kirk/client/response'
+    require 'kirk/client/request'
+    require 'kirk/client/exchange'
+
+    def self.group(opts = {})
+      new.group(opts, &Proc.new)
     end
 
     def group(opts = {})
@@ -33,8 +36,3 @@ module Kirk
     end
   end
 end
-
-require 'kirk/client/group'
-require 'kirk/client/response'
-require 'kirk/client/request'
-require 'kirk/client/exchange'

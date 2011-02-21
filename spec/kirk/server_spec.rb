@@ -8,6 +8,7 @@ describe 'Kirk::Server' do
     last_response.should be_successful
     last_response.should have_body("Hello Rack")
   end
+
   it "runs the server" do
     start hello_world_path('config.ru')
 

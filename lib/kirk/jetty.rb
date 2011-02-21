@@ -22,6 +22,6 @@ module Kirk
     import "org.eclipse.jetty.util.log.Log"
     import "org.eclipse.jetty.util.log.JavaUtilLog"
 
-    Log.set_log Jetty::JavaUtilLog.new
+    Log.set_log Jetty::JavaUtilLog.new unless Kirk.sub_process?
   end
 end

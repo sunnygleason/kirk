@@ -8,12 +8,11 @@ module Kirk
   end
 
   require 'java'
-  require 'kirk/common'
   require 'kirk/version'
-  require 'kirk/native'
-  require 'kirk/jetty'
 
   autoload :Client, 'kirk/client'
+  autoload :Jetty,  'kirk/jetty'
+  autoload :Native, 'kirk/native'
   autoload :Server, 'kirk/server'
 
   import "java.util.concurrent.LinkedBlockingQueue"
@@ -22,10 +21,8 @@ module Kirk
   import "java.util.logging.Level"
   import "java.util.logging.ConsoleHandler"
 
-  module Native
-    import "com.strobecorp.kirk.ApplicationConfig"
-    import "com.strobecorp.kirk.HotDeployableApplication"
-    import "com.strobecorp.kirk.LogFormatter"
+  def self.sub_process?
+    !!defined?(Kirk::SUB_PROCESS)
   end
 
   # Configure the logger

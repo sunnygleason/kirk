@@ -12,6 +12,8 @@ module Kirk
     import "org.eclipse.jetty.client.HttpExchange"
     import "org.eclipse.jetty.client.ContentExchange"
 
+    import "org.eclipse.jetty.io.ByteArrayBuffer"
+
     import "org.eclipse.jetty.server.nio.SelectChannelConnector"
     import "org.eclipse.jetty.server.handler.AbstractHandler"
     import "org.eclipse.jetty.server.handler.ContextHandler"

@@ -44,7 +44,7 @@ module Kirk
         request.headers.each do |name, value|
           exchange.set_request_header(name, value)
         end if request.headers
-        body = ByteArrayBuffer.new(request.body.to_s)
+        body = Jetty::ByteArrayBuffer.new(request.body.to_s)
         exchange.set_request_content(body) if request.body
         exchange
       end

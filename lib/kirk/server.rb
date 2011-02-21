@@ -1,3 +1,5 @@
+require 'kirk'
+
 module Kirk
   class Server
     autoload :ApplicationConfig,  'kirk/server/application_config'

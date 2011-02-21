@@ -1,3 +1,5 @@
+require 'kirk'
+
 module Kirk
   class Client
     import java.net.InetSocketAddress
@@ -6,7 +8,6 @@ module Kirk
     import java.util.concurrent.TimeUnit
     import java.util.concurrent.ThreadPoolExecutor
     import java.util.concurrent.ExecutorCompletionService
-    import org.eclipse.jetty.io.ByteArrayBuffer
 
     class << self
       def group(opts = {})

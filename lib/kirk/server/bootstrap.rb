@@ -52,11 +52,7 @@ module Kirk
       end
 
       def load_kirk
-        require 'kirk/version'
-        require 'kirk/common'
-        require 'kirk/jetty'
-        require 'kirk/server/input_stream'
-        require 'kirk/server/handler'
+        require 'kirk/server'
       end
     end
   end

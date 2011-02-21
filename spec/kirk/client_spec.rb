@@ -194,9 +194,32 @@ describe 'Kirk::Client' do
   end
 
   it "allows to set thread_pool" do
-    thread_pool = QueuedThreadPool.new
+    start_default_app
+
+    my_thread_pool = Class.new(QueuedThreadPool) do
+      def initialize(buffer)
+        @buffer = buffer
+        super()
+      end
+
+      def dispatch(job)
+        @buffer << 1
+        super(job)
+      end
+    end
+
+    @buffer = []
+    thread_pool = my_thread_pool.new(@buffer)
     client = Kirk::Client.new(:thread_pool => thread_pool)
+
+    client.group(:host => "http://localhost:9090") do |g|
+      g.get "/"
+      g.get "/foo"
+    end
+
+    @buffer.length.should > 0
     client.client.get_thread_pool.should == thread_pool
+
     client.stop
   end
 

@@ -76,13 +76,15 @@ describe 'Kirk::Client' do
     end
 
     it "performs POST request" do
+      body = "zomg"
       group = Kirk::Client.group do |g|
-        g.request :POST, "http://localhost:9090/", nil, {'Accept' => 'text/html'}
+        g.request :POST, "http://localhost:9090/", nil, body, {'Accept' => 'text/html'}
       end
 
       response = parse_response(group.responses.first)
-      response["HTTP_ACCEPT"].should == "text/html"
+      response["HTTP_ACCEPT"].should    == "text/html"
       response["REQUEST_METHOD"].should == "POST"
+      response["rack.input"].should     == "zomg"
     end
   end
 

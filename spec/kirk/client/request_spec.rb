@@ -4,12 +4,12 @@ describe Kirk::Client::Request do
   it "allows to pass method, url, headers and handler" do
     handler = Object.new
     group   = Kirk::Client::Group.new
-    request = Kirk::Client::Request.new(group, :GET, "http://localhost",
-                                        handler, {'Accept' => 'text/javascript'})
+    request = Kirk::Client::Request.new(group, :GET, "http://localhost", handler, "body", {'Accept' => 'text/javascript'})
 
     request.method.should  == "GET"
     request.url.should     == "http://localhost"
     request.headers.should == {'Accept' => 'text/javascript'}
+    request.body.should    == "body"
     request.handler.should == handler
   end
 

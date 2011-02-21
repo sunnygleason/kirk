@@ -36,8 +36,8 @@ module Kirk
         @complete
       end
 
-      def request(method = nil, url = nil, handler = nil, headers = {})
-        request = Request.new(self, method, url, handler, headers)
+      def request(method = nil, url = nil, handler = nil, body = nil, headers = {})
+        request = Request.new(self, method, url, handler, body, headers)
         yield request if block_given?
         request.url URI.join(@host, request.url).to_s if @host
         queue_request(request)

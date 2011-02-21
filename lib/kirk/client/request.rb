@@ -2,11 +2,12 @@ class Kirk::Client
   class Request
     attr_reader :group
 
-    def initialize(group, method = nil, url = nil, handler = nil, headers = {})
+    def initialize(group, method = nil, url = nil, handler = nil, body = nil, headers = {})
       @group   = group
       method(method)
       url(url)
       handler(handler)
+      body(body)
       headers(headers)
 
       yield(self) if block_given?

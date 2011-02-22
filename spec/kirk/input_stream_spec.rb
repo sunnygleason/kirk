@@ -149,6 +149,16 @@ describe 'Kirk::Server::InputStream' do
     end
   end
 
+  it "doesn't go crazy if seeking past the max available data" do
+    with_input_stream do |input, writer|
+      writer << "zomgzomg"
+      writer.close
+
+      input.seek(20)
+      input.read(1).should be_nil
+    end
+  end
+
   it "reads large streams in one call" do
     with_input_stream do |input, writer|
       stream_in_bg writer, GIBBERISH

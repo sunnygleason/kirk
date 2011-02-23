@@ -1,8 +1,6 @@
 module Kirk
   class Client
     class Exchange < Jetty::ContentExchange
-      include java.util.concurrent.Callable
-
       def initialize(session, handler)
         @handler = handler
         @session = session

@@ -1,8 +1,8 @@
 module Kirk
   class Server
     class Handler < Jetty::AbstractHandler
-      import 'java.util.zip.GZIPInputStream'
-      import 'java.util.zip.InflaterInputStream'
+      java_import 'java.util.zip.GZIPInputStream'
+      java_import 'java.util.zip.InflaterInputStream'
 
       # Trigger the autoload so that the first access to the class
       # does not happen in a thread.

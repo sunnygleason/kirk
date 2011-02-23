@@ -4,9 +4,9 @@ module Kirk
   Jetty # Trigger the jetty autoload
 
   module Native
-    import "com.strobecorp.kirk.ApplicationConfig"
-    import "com.strobecorp.kirk.HotDeployableApplication"
-    import "com.strobecorp.kirk.LogFormatter"
-    import "com.strobecorp.kirk.RewindableInputStream"
+    java_import "com.strobecorp.kirk.ApplicationConfig"
+    java_import "com.strobecorp.kirk.HotDeployableApplication"
+    java_import "com.strobecorp.kirk.LogFormatter"
+    java_import "com.strobecorp.kirk.RewindableInputStream"
   end
 end

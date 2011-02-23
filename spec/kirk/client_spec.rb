@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'kirk/client'
 
-import org.eclipse.jetty.util.thread.QueuedThreadPool
+java_import org.eclipse.jetty.util.thread.QueuedThreadPool
 
 describe 'Kirk::Client' do
 

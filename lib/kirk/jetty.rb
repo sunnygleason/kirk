@@ -10,21 +10,21 @@ end
 module Kirk
   module Jetty
     # Gimme Jetty
-    import "org.eclipse.jetty.client.HttpClient"
-    import "org.eclipse.jetty.client.HttpExchange"
-    import "org.eclipse.jetty.client.ContentExchange"
+    java_import "org.eclipse.jetty.client.HttpClient"
+    java_import "org.eclipse.jetty.client.HttpExchange"
+    java_import "org.eclipse.jetty.client.ContentExchange"
 
-    import "org.eclipse.jetty.io.ByteArrayBuffer"
+    java_import "org.eclipse.jetty.io.ByteArrayBuffer"
 
-    import "org.eclipse.jetty.server.nio.SelectChannelConnector"
-    import "org.eclipse.jetty.server.handler.AbstractHandler"
-    import "org.eclipse.jetty.server.handler.ContextHandler"
-    import "org.eclipse.jetty.server.handler.ContextHandlerCollection"
-    import "org.eclipse.jetty.server.Server"
+    java_import "org.eclipse.jetty.server.nio.SelectChannelConnector"
+    java_import "org.eclipse.jetty.server.handler.AbstractHandler"
+    java_import "org.eclipse.jetty.server.handler.ContextHandler"
+    java_import "org.eclipse.jetty.server.handler.ContextHandlerCollection"
+    java_import "org.eclipse.jetty.server.Server"
 
-    import "org.eclipse.jetty.util.component.LifeCycle"
-    import "org.eclipse.jetty.util.log.Log"
-    import "org.eclipse.jetty.util.log.JavaUtilLog"
+    java_import "org.eclipse.jetty.util.component.LifeCycle"
+    java_import "org.eclipse.jetty.util.log.Log"
+    java_import "org.eclipse.jetty.util.log.JavaUtilLog"
 
     Log.set_log Jetty::JavaUtilLog.new unless Kirk.sub_process?
   end

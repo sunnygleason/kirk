@@ -15,17 +15,18 @@ module Kirk
   autoload :Native, 'kirk/native'
   autoload :Server, 'kirk/server'
 
-  import "java.net.InetSocketAddress"
+  java_import "java.net.InetSocketAddress"
+  java_import "java.nio.ByteBuffer"
 
-  import "java.util.concurrent.AbstractExecutorService"
-  import "java.util.concurrent.ExecutorCompletionService"
-  import "java.util.concurrent.LinkedBlockingQueue"
-  import "java.util.concurrent.TimeUnit"
-  import "java.util.concurrent.ThreadPoolExecutor"
+  java_import "java.util.concurrent.AbstractExecutorService"
+  java_import "java.util.concurrent.ExecutorCompletionService"
+  java_import "java.util.concurrent.LinkedBlockingQueue"
+  java_import "java.util.concurrent.TimeUnit"
+  java_import "java.util.concurrent.ThreadPoolExecutor"
 
-  import "java.util.logging.Logger"
-  import "java.util.logging.Level"
-  import "java.util.logging.ConsoleHandler"
+  java_import "java.util.logging.Logger"
+  java_import "java.util.logging.Level"
+  java_import "java.util.logging.ConsoleHandler"
 
   def self.sub_process?
     !!defined?(Kirk::SUB_PROCESS)

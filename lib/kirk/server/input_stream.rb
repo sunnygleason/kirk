@@ -5,12 +5,6 @@ module Kirk
       READL_SIZE  = 1_024
       CHUNK_SIZE  = 8_192
       BUFFER_SIZE = 1_024 * 50
-
-      import "java.io.File"
-      import "java.io.RandomAccessFile"
-      import "java.nio.ByteBuffer"
-      import "java.nio.channels.Channels"
-
       BUFFER_POOL = LinkedBlockingQueue.new
 
       def initialize(io)

@@ -99,6 +99,27 @@ describe 'Kirk::Client' do
     end
   end
 
+  it "sets the response status when it is successful" do
+    start lambda { |env| [ 200, { 'Content-Type' => 'text/plain' }, ['Hello'] ] }
+
+    resp = Kirk::Client.get 'http://localhost:9090/'
+    resp.status.should == 200
+  end
+
+  it "sets the response status when it is 201" do
+   start lambda { |env| [ 201, { 'Content-Type' => 'text/plain' }, ['Hello'] ] }
+
+   resp = Kirk::Client.get 'http://localhost:9090/'
+   resp.status.should == 201
+  end
+
+  it "sets the response status when it is 302" do
+    start lambda { |env| [ 302, { 'Content-Type' => 'text/plain' }, ['Hello'] ] }
+
+    resp = Kirk::Client.get 'http://localhost:9090/'
+    resp.status.should == 302
+  end
+
   it "fetches all the headers" do
     headers = { 'Content-Type' => 'text/plain', 'X-FooBar' => "zomg" }
     start(lambda { |env| [ 200, headers, [ "Hello" ] ] })

@@ -20,6 +20,15 @@ module Kirk
       client.group(opts, &blk)
     end
 
+    %w(request head get post put delete).each do |method|
+      class_eval <<-RUBY
+        def self.#{method}(*args, &blk)
+          g = group { |g| g.#{method}(*args, &blk) }
+          g.responses.first
+        end
+      RUBY
+    end
+
     def group(opts = {}, &blk)
       Group.new(self, opts).tap do |group|
         group.start(&blk)

@@ -84,12 +84,11 @@ module Kirk
       #   end
       # end
 
-      # def onRequestComplete
-      #   # p [ :onRequestComplete ]
-      #   if handler.respond_to?(:on_request_complete)
-      #     handler.on_request_complete
-      #   end
-      # end
+      def onRequestComplete
+        if handler.respond_to?(:on_request_complete)
+          handler.on_request_complete
+        end
+      end
 
       def onResponseComplete
         if handler.respond_to?(:on_response_complete)
@@ -121,12 +120,9 @@ module Kirk
         end
       end
 
-      # def onResponseStatus(version, status, reason)
-      #   # p [ :onResponseStatus ]
-      #   super
-      #   response.version = stringify(version)
-      #   response.status  = status
-      # end
+      def onResponseStatus(version, status, reason)
+        response.status = status
+      end
 
       # def onRetry
       #   # p [ :onRetry ]

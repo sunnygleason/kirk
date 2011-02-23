@@ -50,7 +50,7 @@ module Kirk
         request
       end
 
-      %w/get post put delete/.each do |method|
+      %w/get post put delete head/.each do |method|
         class_eval <<-RUBY
           def #{method}(url, headers = nil, handler = nil)
             request(:#{method.upcase}, url, headers, handler)

@@ -40,8 +40,12 @@ module Kirk
 
       def request(method = nil, url = nil, handler = nil, body = nil, headers = {})
         request = Request.new(self, method, url, handler, body, headers)
+
         yield request if block_given?
+
         request.url URI.join(host, request.url).to_s if host
+        request.validate!
+
         queue_request(request)
         request
       end

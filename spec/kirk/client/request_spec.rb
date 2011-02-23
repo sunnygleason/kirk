@@ -32,4 +32,19 @@ describe Kirk::Client::Request do
     request.body.should    == body
   end
 
+  it "requires a method" do
+    lambda {
+      Kirk::Client.group do |g|
+        g.request nil, 'http://lol/'
+      end
+    }.should raise_error(Kirk::Client::InvalidRequestError)
+  end
+
+  it "requires a URL" do
+    lambda {
+      Kirk::Client.group do |g|
+        g.request :GET
+      end
+    }.should raise_error(Kirk::Client::InvalidRequestError)
+  end
 end

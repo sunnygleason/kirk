@@ -1,4 +1,6 @@
 class Kirk::Client
+  class InvalidRequestError < ArgumentError ; end
+
   class Request
     attr_reader :group
 
@@ -25,6 +27,16 @@ class Kirk::Client
     def method(method = nil)
       @method = method.to_s.upcase if method
       @method
+    end
+
+    def validate!
+      unless method
+        raise InvalidRequestError, "Must specify an HTTP method for the request"
+      end
+
+      unless url
+        raise InvalidRequestError, "Must specify a URL for the request"
+      end
     end
   end
 end

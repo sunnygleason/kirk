@@ -11,6 +11,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
+// Special jruby specific methods
+import org.jruby.RubyString;
+
 public class RewindableInputStream extends FilterInputStream {
   // The default buffer size
   public static final int DEFAULT_BUFFER_SIZE = 8192;
@@ -60,6 +63,10 @@ public class RewindableInputStream extends FilterInputStream {
     this.buf = buf;
   }
 
+  public long getPosition() {
+    return position;
+  }
+
   public InputStream getUnbufferedInputStream() {
     return in;
   }
@@ -67,6 +74,8 @@ public class RewindableInputStream extends FilterInputStream {
   @Override
   public synchronized int available() throws IOException {
     long available = buffered - position;
+
+    ensureOpen();
 
     if ( available > Integer.MAX_VALUE ) {
       available = Integer.MAX_VALUE;
@@ -79,7 +88,17 @@ public class RewindableInputStream extends FilterInputStream {
   }
 
   @Override
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
+    if ( buf == null ) {
+      return;
+    }
+
+    if ( tmpFile != null ) {
+      tmpFile.close();
+    }
+
+    io.close();
+    buf = null;
   }
 
   @Override
@@ -95,6 +114,8 @@ public class RewindableInputStream extends FilterInputStream {
   @Override
   public synchronized int read() throws IOException {
     long len;
+
+    ensureOpen();
 
     while ( true ) {
       len = fillBuf(1);
@@ -115,6 +136,8 @@ public class RewindableInputStream extends FilterInputStream {
     int count = 0;
     int len;
 
+    ensureOpen();
+
     while ( count < length ) {
       // Fill the buffer
       len = (int) fillBuf(length - count);
@@ -122,10 +145,10 @@ public class RewindableInputStream extends FilterInputStream {
       // Handle EOFs
       if ( len == -1 ) {
         if ( count == 0 ) {
-          count = -1;
+          return -1;
         }
 
-        break;
+        return count;
       }
 
       buf.get(buffer, offset + count, len);
@@ -136,6 +159,32 @@ public class RewindableInputStream extends FilterInputStream {
     return count;
   }
 
+  public byte[] read(int length) throws IOException {
+    byte[] bytes = new byte[length];
+    int len = read(bytes, 0, length);
+
+    if ( len == -1 ) {
+      return null;
+    }
+    else if ( len != length ) {
+      byte[] sized = new byte[len];
+      bytes = sized;
+    }
+
+    return bytes;
+  }
+
+  // public synchronized int readAndAppendTo(RubyString str, int length) throws IOException {
+  //   byte[] bytes = new byte[length];
+  //   int len = read(bytes, 0, length);
+
+  //   if ( len > 0 ) {
+  //     str.getByteList().append(bytes, 0, len);
+  //   }
+
+  //   return len;
+  // }
+
   @Override
   public synchronized void reset() throws IOException {
     if ( mark < 0 ) {
@@ -145,10 +194,13 @@ public class RewindableInputStream extends FilterInputStream {
     position = mark;
   }
 
+  // XXX This is completely busted ;-)
   @Override
   public synchronized long skip(long amount) throws IOException {
     long count = 0;
     long len;
+
+    ensureOpen();
 
     while ( amount > count ) {
       len = fillBuf(amount - count);
@@ -163,12 +215,24 @@ public class RewindableInputStream extends FilterInputStream {
     return count;
   }
 
-  public synchronized void seek(long newPosition) {
+  public synchronized void seek(long newPosition) throws IOException {
+    ensureOpen();
+
+    if ( newPosition < 0 ) {
+      throw new IOException("Cannot seek to a negative position");
+    }
+
     this.position = newPosition;
   }
 
-  public synchronized void rewind() {
+  public synchronized void rewind() throws IOException {
     seek(0);
+  }
+
+  private void ensureOpen() throws IOException {
+    if ( buf == null ) {
+      throw new IOException("IO is closed");
+    }
   }
 
   private long fillBuf(long length) throws IOException {
@@ -178,13 +242,11 @@ public class RewindableInputStream extends FilterInputStream {
         rotateToTmpFile();
       }
 
-      fillBufFromTmpFile(length);
+      return fillBufFromTmpFile(length);
     }
     else {
       return fillBufFromMem(length);
     }
-
-    return 0;
   }
 
   private long fillBufFromMem(long length) throws IOException {
@@ -192,19 +254,28 @@ public class RewindableInputStream extends FilterInputStream {
     int  len;
 
     limit = position + length;
-    buf.limit((int) limit).position((int) buffered);
 
-    len = io.read(buf);
+    if ( buffered < limit ) {
+      buf.limit((int) limit).position((int) buffered);
 
-    if ( len == -1 ) {
-      return -1;
+      len = io.read(buf);
+
+      if ( len == -1 ) {
+        if ( buffered <= position ) {
+          return -1;
+        }
+      }
+      else {
+        buffered += len;
+
+        if ( buffered <= position ) {
+          return 0;
+        }
+      }
     }
 
-    buf.flip();
-
-    buffered += len;
-
-    return Math.max(0, buffered - position);
+    buf.limit((int) limit).position((int) position);
+    return Math.min(buffered - position, length);
   }
 
   private long fillBufFromTmpFile(long length) throws IOException {
@@ -237,11 +308,14 @@ public class RewindableInputStream extends FilterInputStream {
         return -1;
       }
 
-      buf.flip().mark();
+      buf.flip();
 
       tmpFile.position(buffered);
       tmpFile.write(buf);
-      buf.reset();
+
+      buffered += len;
+
+      buf.position(0);
 
       return len;
     }
@@ -291,7 +365,7 @@ public class RewindableInputStream extends FilterInputStream {
     fileStream = new RandomAccessFile(file, "rw");
     tmpFile    = fileStream.getChannel();
 
-    buf.position(0).limit((int) buffered);
+    buf.clear().position(0).limit((int) buffered);
     tmpFile.write(buf);
     buf.clear();
   }

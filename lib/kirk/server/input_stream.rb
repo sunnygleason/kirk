@@ -10,20 +10,10 @@ module Kirk
       import "java.nio.ByteBuffer"
       import "java.nio.channels.Channels"
 
-      # For our ROFL scale needs
-      import "java.util.concurrent.LinkedBlockingQueue"
-
-      BUFFER_POOL    = LinkedBlockingQueue.new
-      TMPFILE_PREFIX = "rackinput".to_java_string
-      TMPFILE_SUFFIX = "".to_java_string
+      BUFFER_POOL = LinkedBlockingQueue.new
 
       def initialize(io)
-        @io       = channelize(io)
-        @buffer   = grab_buffer
-        @filebuf  = nil
-        @read     = 0
-        @position = 0
-        @eof      = false
+        @io, @buffer = init_rewindable_input(io)
       end
 
       def read(size = nil, buffer = nil)
@@ -36,14 +26,15 @@ module Kirk
 
         loop do
           limit = size && size < CHUNK_SIZE ? size : CHUNK_SIZE
+          data  = @io.read(limit)
 
-          len = read_chunk(limit, buffer)
-
-          break unless len
+          break unless data
 
           one_loop = true
 
-          break if size && ( size -= len ) <= 0
+          buffer << String.from_java_bytes(data)
+
+          break if size && ( size -= data.length ) <= 0
         end
 
         return "" if read_all && !one_loop
@@ -81,183 +72,41 @@ module Kirk
       end
 
       def pos
-        @position
+        @io.position
       end
 
       def seek(pos)
         raise Errno::EINVAL, "Invalid argument - invalid seek value" if pos < 0
-        @position = pos
+        @io.seek(pos)
       end
 
       def rewind
-        seek(0)
+        @io.rewind
       end
 
       def close
-        nil
+        p [ :CLOSE ]
+        @io.close
       end
 
       def recycle
-        BUFFER_POOL.put(@buffer)
-        @buffer = nil
-        nil
+        p [ :RECYCLE ]
+        @io.close
+
+        BUFFER_POOL.put(@byte_buffer)
+
+        @buffer, @io = nil, nil
       end
 
     private
-
-      def channelize(stream)
-        Channels.new_channel(stream)
-      end
 
       def grab_buffer
         BUFFER_POOL.poll || ByteBuffer.allocate(BUFFER_SIZE)
       end
 
-      def read_chunk(size, string)
-        missing = size - ( @read - @position )
-
-        if @filebuf || @read + missing > BUFFER_SIZE
-
-          rotate_to_tmp_file unless @filebuf
-          read_chunk_from_tmp_file(size, string)
-
-        else
-
-          read_chunk_from_mem(size, string, missing)
-
-        end
-      end
-
-      def read_chunk_from_mem(size, string, missing)
-        # We gonna have to read from the input stream
-        if missing > 0 && !@eof
-
-          # Set the new buffer limit to the amount that is going
-          # to be read
-          @buffer.limit(@read + missing).position(@read)
-
-          # Read into the buffer
-          len = @io.read(@buffer)
-
-          # Bail if we're at the EOF
-          if len == -1
-            @eof = true
-            return
-          end
-
-          @read += len
-
-        # We're at the end
-        elsif @position == @read
-
-          return
-
-        end
-
-        limit = @position + size
-        limit = @read if @read < limit
-
-        # Now move the amount read into the string
-        @buffer.position(@position).limit(limit)
-
-        append_buffer_to_string(@buffer, string)
-      end
-
-      def read_chunk_from_tmp_file(size, string)
-
-        if @read < @position && !@eof
-
-          return unless buffer_to(@position)
-
-        end
-
-        @buffer.clear.limit(size)
-
-        if @read > @position
-
-          @filebuf.position(@position)
-          @filebuf.read(@buffer)
-
-        elsif @eof
-
-          return
-
-        end
-
-        unless @eof
-
-          offset = @buffer.position
-          len    = @io.read(@buffer)
-
-          if len == -1
-
-            @eof = true
-            return if offset == 0
-
-          else
-
-            @filebuf.position(@read)
-            @filebuf.write(@buffer.flip.position(offset))
-
-            @read += len
-
-          end
-
-          @buffer.position(0)
-
-        end
-
-        append_buffer_to_string(@buffer, string)
-      end
-
-      def buffer_to(position)
-        until @read == position
-          limit = position - @read
-          limit = BUFFER_SIZE if limit > BUFFER_SIZE
-
-          @buffer.clear.limit(limit)
-
-          len = @io.read(@buffer)
-
-          if len == -1
-            @eof = true
-            return
-          end
-
-          @buffer.flip
-
-          @filebuf.position(@read)
-          @filebuf.write(@buffer)
-
-          @read += len
-        end
-
-        true
-      end
-
-      def append_buffer_to_string(buffer, string)
-        len   = buffer.limit - buffer.position
-        bytes = Java::byte[len].new
-        buffer.get(bytes)
-        string << String.from_java_bytes(bytes)
-        @position += len
-        len
-      end
-
-      def rotate_to_tmp_file
-        @buffer.position(0).limit(@read)
-
-        @filebuf = create_tmp_file
-        @filebuf.write @buffer
-
-        @buffer.clear
-      end
-
-      def create_tmp_file
-        file = File.create_temp_file(TMPFILE_PREFIX, TMPFILE_SUFFIX)
-        file.delete_on_exit
-
-        RandomAccessFile.new(file, "rw").channel
+      def init_rewindable_input(io)
+        buf = grab_buffer
+        [ Native::RewindableInputStream.new(io, buf), buf ]
       end
     end
   end

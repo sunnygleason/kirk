@@ -91,6 +91,8 @@ describe 'Kirk::Server::InputStream' do
       input.read(3, str).should == 'zom'
       str.should == 'zom'
 
+      input.pos.should == 3
+
       input.read(3, str).should == 'gzo'
       str.should == 'gzo'
     end
@@ -121,6 +123,7 @@ describe 'Kirk::Server::InputStream' do
 
       input.read.should == "zomgzomg"
       input.rewind
+      input.pos.should == 0
       input.read.should == "zomgzomg"
       input.read(1).should be_nil
     end
@@ -162,7 +165,8 @@ describe 'Kirk::Server::InputStream' do
   it "reads large streams in one call" do
     with_input_stream do |input, writer|
       stream_in_bg writer, GIBBERISH
-      input.read.should == GIBBERISH
+      ret = input.read
+      ret.should == GIBBERISH
     end
   end
 

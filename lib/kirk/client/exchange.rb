@@ -125,18 +125,17 @@ module Kirk
         response.status = status
       end
 
-      # def onRetry
-      #   # p [ :onRetry ]
-      #   if handler.respond_to?(:on_retry)
-      #     handler.on_retry
-      #   end
-      #   super
-      # end
+      def onRetry
+        if handler.respond_to?(:on_retry)
+          handler.on_retry
+        end
 
-      # def onSwitchProtocol(end_point)
-      #   # p [ :onSwitchProtocol ]
-      #   # What is this exactly?
-      # end
+        super
+      end
+
+      def onSwitchProtocol(end_point)
+        # What is this exactly?
+      end
 
     private
 

@@ -97,6 +97,14 @@ module Kirk
         @buffer, @io = nil, nil
       end
 
+      def to_inputstream
+        @io
+      end
+
+      def to_raw_inputstream
+        @io.unbuffered_input_stream
+      end
+
     private
 
       def grab_buffer

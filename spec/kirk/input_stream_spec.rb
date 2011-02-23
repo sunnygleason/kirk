@@ -258,4 +258,24 @@ describe 'Kirk::Server::InputStream' do
       end
     end
   end
+
+  describe "#to_inputstream" do
+    it "returns an instance of the raw InputStreamFilter" do
+      with_input_stream do |input, writer|
+        writer.close
+        input.to_inputstream.should be_instance_of(Kirk::Native::RewindableInputStream)
+      end
+    end
+  end
+
+  describe "#to_raw_inputstream" do
+    it "returns an input stream that is not rewindable" do
+      with_input_stream do |input, writer|
+        writer.close
+        io = input.to_raw_inputstream
+        io.should_not be_kind_of(Kirk::Native::RewindableInputStream)
+        io.should be_kind_of(java::io::InputStream)
+      end
+    end
+  end
 end

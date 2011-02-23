@@ -46,7 +46,7 @@ module Kirk
         request.url URI.join(host, request.url).to_s if host
         request.validate!
 
-        queue_request(request)
+        process(request)
         request
       end
 
@@ -58,7 +58,7 @@ module Kirk
         RUBY
       end
 
-      def queue_request(request)
+      def process(request)
         @client.process(request)
         @requests_count += 1
       end

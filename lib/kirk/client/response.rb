@@ -1,16 +1,26 @@
 class Kirk::Client
   class Response
-    attr_accessor :version, :status, :body, :headers
+    attr_accessor :version, :status, :body, :headers, :exception
 
     def initialize(buffer_body)
-      @status, @version, @headers = nil, nil, {}
-      @buffer_body = buffer_body
-
-      @body = buffer_body ? "" : nil
+      @status       = nil
+      @version      = nil
+      @headers      = {}
+      @buffer_body  = buffer_body
+      @body         = buffer_body ? "" : nil
+      @exception    = nil
     end
 
     def buffer_body?
       @buffer_body
+    end
+
+    def success?
+      @status && @status < 400 && !@exception
+    end
+
+    def exception?
+      @exception
     end
   end
 end

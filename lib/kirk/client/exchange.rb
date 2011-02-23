@@ -70,11 +70,12 @@ module Kirk
       # end
 
       def onException(ex)
-        p [ :onException, ex.message ]
-        puts ex.backtrace
         if handler.respond_to?(:on_exception)
           handler.on_exception(ex)
         end
+
+        response.exception = true
+        group.respond(response)
       end
 
       # def onExpire

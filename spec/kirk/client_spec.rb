@@ -217,6 +217,20 @@ describe 'Kirk::Client' do
       group.should have(1).responses
       @completed.should be_true
     end
+
+    it "handles exceptions in the callbacks" do
+      start_default_app
+
+      handler = Class.new do
+        def on_request_complete(*)
+          raise "fail"
+        end
+      end
+
+      resp = Kirk::Client.get 'http://localhost:9090/', handler.new
+      resp.success?.should be_false
+      resp.exception?.should be_true
+    end
   end
 
   it "allows to set thread_pool" do

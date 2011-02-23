@@ -85,15 +85,13 @@ module Kirk
       end
 
       def close
-        p [ :CLOSE ]
         @io.close
       end
 
       def recycle
-        p [ :RECYCLE ]
         @io.close
 
-        BUFFER_POOL.put(@byte_buffer)
+        BUFFER_POOL.put(@buffer)
 
         @buffer, @io = nil, nil
       end

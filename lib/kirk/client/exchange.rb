@@ -1,11 +1,58 @@
 module Kirk
   class Client
     class Exchange < Jetty::ContentExchange
-      def initialize(session, handler)
-        @handler = handler
-        @session = session
+
+      def self.from_request(req)
+        new.tap do |inst|
+          inst.group    = req.group
+          inst.handler  = req.handler
+          inst.method   = req.method
+          inst.url      = req.url
+
+          if req.headers
+            req.headers.each do |name, val|
+              inst.set_request_header(name, val)
+            end
+          end
+
+          if req.body
+            #
+            # If the body is already an InputStream (thus in the correct
+            # format), just run with it.
+            if Java::JavaIo::InputStream === req.body
+              inst.request_content_source = req.body
+            #
+            # If the body responds to the JRuby method that converts
+            # an object to an InputStream, then use that
+            elsif req.body.respond_to?(:to_inputstream)
+              inst.request_content_source = req.body.to_inputstream
+            #
+            # If it responds to :read but not to :to_inputstream, then
+            # it is a ruby object that is trying to look like an IO but
+            # hasn't implemented the magic JRuby conversion method, so
+            # we have to make it work.
+            #
+            # XXX Implement an InputStream subclass that can wrap ruby
+            # IO like objects
+            elsif req.body.respond_to?(:read)
+              inst.request_content = bufferize(req.body.read)
+            #
+            # The fallback plan is to just call #to_s on the object
+            else
+              inst.request_content = bufferize(req.body.to_s)
+            end
+          end
+        end
+      end
+
+      def self.bufferize(obj)
+        Jetty::ByteArrayBuffer.new(obj.to_s)
+      end
+
+      attr_accessor :group, :handler
+
+      def initialize
         @headers = {}
-        super()
       end
 
       def on_exception(ex)
@@ -13,7 +60,7 @@ module Kirk
       end
 
       def on_response_complete
-        @session.queue.put(response)
+        @group.queue.put(response)
         handle(:on_response_complete, response)
         super
       end
@@ -33,22 +80,6 @@ module Kirk
         @response ||= begin
           Response.new(get_response_content, get_response_status, @headers)
         end
-      end
-
-      def self.from_request(request)
-        exchange = new(request.group, request.handler)
-        exchange.set_method(request.method)
-        exchange.set_url(request.url)
-        request.headers.each do |name, value|
-          exchange.set_request_header(name, value)
-        end if request.headers
-        if request.body && request.body.respond_to?(:read)
-          exchange.set_request_content_source(request.body.to_inputstream)
-        else
-          body = Jetty::ByteArrayBuffer.new(request.body.to_s)
-          exchange.set_request_content(body)
-        end
-        exchange
       end
 
       def handle(method, *args)

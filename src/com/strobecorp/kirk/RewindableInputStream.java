@@ -168,6 +168,7 @@ public class RewindableInputStream extends FilterInputStream {
     }
     else if ( len != length ) {
       byte[] sized = new byte[len];
+      System.arraycopy(bytes, 0, sized, 0, len);
       bytes = sized;
     }
 
@@ -326,7 +327,7 @@ public class RewindableInputStream extends FilterInputStream {
     int  len;
 
     while ( buffered < pos ) {
-      limit = pos - buffered;
+      limit = Math.min(pos - buffered, buf.capacity());
 
       buf.clear().limit((int) limit);
 

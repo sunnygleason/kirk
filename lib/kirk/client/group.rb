@@ -3,7 +3,7 @@ require 'uri'
 module Kirk
   class Client
     class Group
-      attr_reader :client, :host, :options, :responses, :queue
+      attr_reader :client, :host, :options, :responses
 
       def initialize(client = Client.new, options = {})
         @options = options
@@ -50,6 +50,10 @@ module Kirk
         request
       end
 
+      def respond(response)
+        @queue.put(response)
+      end
+
       %w/get post put delete head/.each do |method|
         class_eval <<-RUBY
           def #{method}(url, headers = nil, handler = nil)
@@ -65,8 +69,12 @@ module Kirk
 
       def get_responses
         while @requests_count > 0
-          @responses << @queue.take
-          @requests_count -= 1
+          if resp = @queue.poll(timeout, TimeUnit::SECONDS)
+            @responses << resp
+            @requests_count -= 1
+          else
+            raise "timed out"
+          end
         end
 
         completed
@@ -76,6 +84,10 @@ module Kirk
 
       def completed
         complete.call if complete
+      end
+
+      def timeout
+        @options[:timeout] || 30
       end
     end
   end

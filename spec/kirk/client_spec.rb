@@ -113,7 +113,7 @@ describe 'Kirk::Client' do
         @buffer = buffer
       end
 
-      def on_response_content(content)
+      def on_response_body(resp, content)
         @buffer << content
       end
     end
@@ -156,14 +156,14 @@ describe 'Kirk::Client' do
       @buffer.first.should == group.responses.first
     end
 
-    it "handles on_response_header callback" do
+    it "handles on_response_head callback" do
       handler = Class.new do
         def initialize(buffer)
           @buffer = buffer
         end
 
-        def on_response_header(headers)
-          @buffer << headers
+        def on_response_head(resp)
+          @buffer << resp.headers
         end
       end
 
@@ -175,7 +175,11 @@ describe 'Kirk::Client' do
       end
 
       sleep(0.05)
-      @buffer.first.should == {'Content-Type' => 'text/plain'}
+      @buffer.first.should == {
+        'Content-Type'   => 'text/plain',
+        'Content-Length' => '5',
+        'Server'         => 'Jetty(7.2.2.v20101205)'
+      }
     end
 
     it "calls complete callback after finishing all the requests" do

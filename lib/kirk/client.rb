@@ -39,8 +39,7 @@ module Kirk
     end
 
     def process(request)
-      exchange = Exchange.from_request(request)
-      client.send(exchange)
+      client.send Exchange.build(request)
     end
 
     def stop

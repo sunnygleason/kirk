@@ -1,11 +1,16 @@
 class Kirk::Client
   class Response
-    attr_reader :status, :body, :headers
+    attr_accessor :version, :status, :body, :headers
 
-    def initialize(body, status, headers)
-      @body    = body
-      @status  = status
-      @headers = headers
+    def initialize(buffer_body)
+      @status, @version, @headers = nil, nil, {}
+      @buffer_body = buffer_body
+
+      @body = buffer_body ? "" : nil
+    end
+
+    def buffer_body?
+      @buffer_body
     end
   end
 end

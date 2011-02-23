@@ -1,6 +1,7 @@
 module Kirk
   class Server
     class InputStream
+      Native # Trigger the autoload
       READL_SIZE  = 1_024
       CHUNK_SIZE  = 8_192
       BUFFER_SIZE = 1_024 * 50

@@ -130,7 +130,7 @@ module Kirk
 
           body.close if body.respond_to?(:close)
         ensure
-          input.recycle if input
+          input.recycle if input.respond_to?(:recycle)
           request.set_handled(true)
         end
       end

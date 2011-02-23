@@ -11,7 +11,7 @@ module Kirk
 
           if req.headers
             req.headers.each do |name, val|
-              inst.set_request_header(name, val)
+              inst.set_request_header(name.to_s, val.to_s)
             end
           end
 

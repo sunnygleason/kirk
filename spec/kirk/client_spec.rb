@@ -29,7 +29,7 @@ describe 'Kirk::Client' do
           r.method  :post
           r.url     "/foo"
           r.handler handler.new(@buffer)
-          r.headers "Accept" => "text/plain"
+          r.headers "Accept" => "text/plain", :Bizz => :bazz
           r.body    body
         end
       end
@@ -38,6 +38,7 @@ describe 'Kirk::Client' do
       response["PATH_INFO"].should == "/foo"
       response["HTTP_ACCEPT"].should == "text/plain"
       response["REQUEST_METHOD"].should == "POST"
+      response["HTTP_BIZZ"].should == "bazz"
       response["rack.input"].should == "foobar"
       @buffer.should == group.responses
     end

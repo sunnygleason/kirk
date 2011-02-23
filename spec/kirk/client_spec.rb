@@ -199,7 +199,7 @@ describe 'Kirk::Client' do
       @buffer.first.should == {
         'Content-Type'   => 'text/plain',
         'Content-Length' => '5',
-        'Server'         => 'Jetty(7.2.2.v20101205)'
+        'Server'         => 'Jetty(7.3.0.v20110203)'
       }
     end
 

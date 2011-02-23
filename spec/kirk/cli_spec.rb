@@ -4,6 +4,9 @@ describe "Kirk CLI interface" do
   it "reads the configuration file, starts kirk, then redeploys" do
     kirk "-c #{kirked_up_path}/Kirkfile" do |c|
       c.stdout.gets.should =~ /INFO - jetty/
+      c.stdout.gets.should =~ /INFO - started o.e.j.s.h.ContextHandler/
+      c.stdout.gets.should =~ /INFO - started o.e.j.s.h.ContextHandler/
+      c.stdout.gets.should =~ /INFO - started o.e.j.s.h.ContextHandler/
       c.stdout.gets.should =~ /INFO - Started SelectChannelConnector@0\.0\.0\.0:9090/
 
       get '/'

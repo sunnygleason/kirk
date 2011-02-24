@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.platform    = "java"
   s.authors     = ["Carl Lerche"]
   s.email       = ["me@carllerche.com"]
-  s.homepage    = "http://github.com/carllerche/kirk"
+  s.homepage    = "http://github.com/strobecorp/kirk"
   s.summary     = "A JRuby Rack Server Based on Jetty"
 
   s.description = <<-DESCRIPTION

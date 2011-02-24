@@ -94,6 +94,73 @@ Use your OS features. For example, write an upstart script or use
 
 Kirk just dumps logs to stdout, so just pipe Kirk to `logger`.
 
+### Kirk::Client - For all your HTTP needs
+
+Need to make one off HTTP requests?
+
+    resp = Kirk::Client.get 'http://www.google.com'
+    puts resp.body
+
+That was cool, but I wouldn't recommending doing that in your Rails app.
+Following is the more advanced API.
+
+First, create an instance of Kirk::Client. This object is thread-safe (or at
+least it should be) and will manage your connection pool. Any connection that
+can be kept alive will be stored by Kirk::Client and reused on subsequent requests.
+
+    MY_CLIENT = Kirk::Client.new
+
+Next, you'll want to implement a class to handle the responses. Just implement
+any method that you want to use.
+
+    class MyHandler
+      # Handle exceptions
+      def on_exception(exception)
+      end
+
+      # The request to the server has finished, but the
+      # server has not responded yet.
+      def on_request_complete
+      end
+
+      # The server has finished sending the response header
+      def on_response_head(response)
+        puts "STATUS: #{response.status}"
+        response.headers.each do |name, val|
+          puts "  #{name}: #{val}"
+        end
+      end
+
+      # The server is sending the response body. This method could
+      # be called multiple times depending on the number of chunks
+      # that are received.
+      #
+      # Also, if this method is implemented, the response body won't
+      # be buffered in the response object.
+      def on_response_body(response, chunk)
+        # response.body == nil
+        print chunk
+      end
+
+      def on_response_complete(response)
+        puts "The response has been received"
+      end
+    end
+
+Now, you can start making the requests.
+
+    MY_CLIENT.group do |g|
+
+      # All of these requests will happen in parallel.
+      g.get  'http://www.google.com',  MyHandler.new
+      g.post 'http://www.twitter.com', MyHandler.new, "Some request body"
+      g.get  'http://www.amazon.com', nil, nil, 'X-Custom-Header' => 'Blah'
+
+      # The group will block until all of the requests are completed.
+    end
+
+Hopefully that is enough to get started.
+
 ### Caveats
 
 This is still a pretty new project and a lot of settings that should be

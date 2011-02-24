@@ -1,8 +1,6 @@
 require 'java'
 
 module Kirk
-  SUB_PROCESS = true
-
   class Server
     class Bootstrap
       def warmup(application_path)

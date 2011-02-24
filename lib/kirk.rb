@@ -29,7 +29,7 @@ module Kirk
   java_import "java.util.logging.ConsoleHandler"
 
   def self.sub_process?
-    !!defined?(Kirk::SUB_PROCESS)
+    !!defined?(Kirk::PARENT_VERSION)
   end
 
   # Configure the logger

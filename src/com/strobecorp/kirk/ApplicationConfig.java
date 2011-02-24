@@ -8,6 +8,7 @@ public interface ApplicationConfig {
   public String             getApplicationPath();
   public String             getRackupPath();
   public String             getBootstrapPath();
+  public String             getKirkVersionStamper();
   public Map                getEnvironment();
   public LifeCycle.Listener getLifeCycleListener();
 

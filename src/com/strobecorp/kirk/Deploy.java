@@ -49,6 +49,7 @@ public class Deploy {
   private void initializeScriptingContext() {
     context = new ScriptingContainer(LocalContextScope.SINGLETHREAD);
     context.setEnvironment(config.getEnvironment());
+    context.runScriptlet(config.getKirkVersionStamper());
 
     this.bootstrapper = context.runScriptlet(
       PathType.ABSOLUTE, config.getBootstrapPath());

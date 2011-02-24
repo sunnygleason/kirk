@@ -44,5 +44,13 @@ module Kirk
 
       map
     end
+
+    def getKirkVersionStamper
+      <<-RUBY
+        module Kirk
+          PARENT_VERSION = #{VERSION.inspect}.freeze
+        end
+      RUBY
+    end
   end
 end

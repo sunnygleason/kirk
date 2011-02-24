@@ -19,8 +19,9 @@ describe "Kirk's Rack handler" do
       'rack.url_scheme'   => 'http',
 
       # Request specific
-      'REQUEST_URI'       => '/',
+      'SCRIPT_NAME'       => '',
       'PATH_INFO'         => '/',
+      'REQUEST_URI'       => '/',
       'REQUEST_METHOD'    => 'GET',
       'QUERY_STRING'      => '',
       'SERVER_NAME'       => 'example.org',

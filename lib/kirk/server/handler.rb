@@ -63,8 +63,9 @@ module Kirk
       def handle(target, base_request, request, response)
         begin
           env = DEFAULT_RACK_ENV.merge(
-            REQUEST_URI     => request.getRequestURI,
+            SCRIPT_NAME     => "",
             PATH_INFO       => request.get_path_info,
+            REQUEST_URI     => request.getRequestURI,
             REQUEST_METHOD  => request.get_method       || "GET",
             RACK_URL_SCHEME => request.get_scheme       || "http",
             QUERY_STRING    => request.get_query_string || "",

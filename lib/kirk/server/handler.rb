@@ -73,7 +73,7 @@ module Kirk
             REMOTE_HOST     => request.get_remote_host  || "",
             REMOTE_ADDR     => request.get_remote_addr  || "",
             REMOTE_USER     => request.get_remote_user  || "",
-            SERVER_PORT     => request.get_server_port.to_s,
+            SERVER_PORT     => request.get_local_port.to_s,
             RACK_VERSION    => ::Rack::VERSION)
 
           # Process the content length

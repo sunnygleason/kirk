@@ -29,6 +29,7 @@ describe "Kirk's Rack handler" do
       'REMOTE_ADDR'       => '127.0.0.1',
       'REMOTE_USER'       => '',
       'SERVER_PORT'       => '80',
+      'LOCAL_PORT'        => '9090',
 
       'CONTENT_LENGTH'    => "0",
       'HTTP_HOST'         => "example.org",

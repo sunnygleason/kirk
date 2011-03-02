@@ -15,6 +15,7 @@ module Kirk
       QUERY_STRING   = 'QUERY_STRING'.freeze
       SERVER_NAME    = 'SERVER_NAME'.freeze
       SERVER_PORT    = 'SERVER_PORT'.freeze
+      LOCAL_PORT     = 'LOCAL_PORT'.freeze
       CONTENT_TYPE   = 'CONTENT_TYPE'.freeze
       CONTENT_LENGTH = 'CONTENT_LENGTH'.freeze
       REQUEST_URI    = 'REQUEST_URI'.freeze
@@ -73,7 +74,8 @@ module Kirk
             REMOTE_HOST     => request.get_remote_host  || "",
             REMOTE_ADDR     => request.get_remote_addr  || "",
             REMOTE_USER     => request.get_remote_user  || "",
-            SERVER_PORT     => request.get_local_port.to_s,
+            SERVER_PORT     => request.get_server_port.to_s,
+            LOCAL_PORT      => request.get_local_port.to_s,
             RACK_VERSION    => ::Rack::VERSION)
 
           # Process the content length

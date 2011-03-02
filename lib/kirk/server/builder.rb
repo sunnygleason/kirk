@@ -65,12 +65,15 @@ module Kirk
         @current.hosts.concat hosts
       end
 
-      def listen(listen)
-        listen = listen.to_s
-        listen = ":#{listen}" unless listen.index(':')
-        listen = "0.0.0.0#{listen}" if listen.index(':') == 0
+      def listen(*listeners)
+        listeners = listeners.map do |listener|
+          listener = listener.to_s
+          listener = ":#{listener}"   unless listener.index(':')
+          listener = "0.0.0.0#{listener}" if listener.index(':') == 0
+          listener
+        end
 
-        @current.listen = listen
+        @current.listen = listeners
       end
 
       def watch(*watch)
@@ -88,7 +91,7 @@ module Kirk
             application = HotDeployable.new(c)
             application.add_watcher(watcher)
 
-            ctx.set_connector_names [c.listen]
+            ctx.set_connector_names c.listen
             ctx.set_handler application
           end
         end
@@ -102,15 +105,17 @@ module Kirk
         @connectors = {}
 
         @configs.each do |config|
-          next if @connectors.key?(config.listen)
+          config.listen.each do |listener|
+            next if @connectors.key?(listener)
 
-          host, port = config.listen.split(':')
+            host, port = listener.split(':')
 
-          connector = Jetty::SelectChannelConnector.new
-          connector.set_host(host)
-          connector.set_port(port.to_i)
+            connector = Jetty::SelectChannelConnector.new
+            connector.set_host(host)
+            connector.set_port(port.to_i)
 
-          @connectors[config.listen] = connector
+            @connectors[listener] = connector
+          end
         end
 
         @connectors.values
@@ -135,7 +140,7 @@ module Kirk
 
       def new_config
         ApplicationConfig.new.tap do |config|
-          config.listen         = '0.0.0.0:9090'
+          config.listen         = ['0.0.0.0:9090']
           config.watch          = [ ]
           config.bootstrap_path = File.expand_path('../bootstrap.rb', __FILE__)
         end

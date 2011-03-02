@@ -82,6 +82,38 @@ describe 'Kirk::Server' do
     last_response.should have_body('Hello World')
   end
 
+  it "can start the same application on multiple ports" do
+    path = hello_world_path('config.ru')
+
+    start do
+      log :level => :warning
+
+      rack "#{path}" do
+        listen 9091, '127.0.0.1:9092'
+      end
+    end
+
+    lambda {
+      get '/'
+    }.should raise_error(Errno::ECONNREFUSED)
+
+    host! IP_ADDRESS, 9091
+
+    get '/'
+    last_response.should have_body('Hello World')
+
+    host! IP_ADDRESS, 9092
+
+    lambda {
+      get '/'
+    }.should raise_error(Errno::ECONNREFUSED)
+
+    host! '127.0.0.1', 9092
+
+    get '/'
+    last_response.should have_body('Hello World')
+  end
+
   it "can partition applications by the host name" do
     path1 = hello_world_path('config.ru')
     path2 = goodbye_world_path('config.ru')

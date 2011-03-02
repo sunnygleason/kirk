@@ -122,7 +122,9 @@ module Kirk
             when CONTENT_LENGTH_RESP
               response.set_content_length(value.to_i)
             else
-              response.set_header(header, value)
+              value.split("\n").each do |v|
+                response.add_header(header, v)
+              end
             end
           end
 

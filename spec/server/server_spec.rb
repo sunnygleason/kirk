@@ -9,6 +9,13 @@ describe 'Kirk::Server' do
     last_response.should have_body("Hello Rack")
   end
 
+  it "handles cookie headers properly" do
+    start lambda { |env| [ 200, { 'Cookie' => "a=b\nc=d" }, [ "Hello Cookie" ] ] }
+
+    get '/'
+    last_response.headers["Cookie"].should == "a=b, c=d"
+  end
+
   it "runs the server" do
     start hello_world_path('config.ru')
 

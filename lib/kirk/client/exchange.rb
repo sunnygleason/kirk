@@ -22,7 +22,7 @@ module Kirk
         self.request  = request
         self.response = Response.new(!handler.respond_to?(:on_response_body))
         self.method   = request.method
-        self.url      = request.url
+        self.url      = request.url.to_s
 
         if request.headers
           request.headers.each do |name, val|

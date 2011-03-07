@@ -38,6 +38,13 @@ describe 'Kirk::Client' do
       response["REQUEST_METHOD"].should == "DELETE"
     end
 
+    it "does not freak out when URI is passed" do
+      response = Kirk::Client.get(URI.parse("http://localhost:9090/foo"))
+      response = parse_response(response)
+      response["PATH_INFO"].should      == "/foo"
+      response["REQUEST_METHOD"].should == "GET"
+    end
+
     it "allows to pass block for request" do
       handler = Class.new do
         def initialize(buffer)

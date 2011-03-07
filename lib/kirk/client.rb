@@ -23,6 +23,10 @@ module Kirk
     %w(request head get post put delete).each do |method|
       class_eval <<-RUBY
         def self.#{method}(*args, &blk)
+          client.#{method}(*args, &blk)
+        end
+
+        def #{method}(*args, &blk)
           g = group { |g| g.#{method}(*args, &blk) }
           g.responses.first
         end

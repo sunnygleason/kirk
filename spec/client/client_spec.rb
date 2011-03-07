@@ -10,6 +10,34 @@ describe 'Kirk::Client' do
       start echo_app_path('config.ru')
     end
 
+    it "allows to run individual request" do
+      client = Kirk::Client.new
+      response = client.request :GET, "http://localhost:9090/foo", nil, "foobar"
+
+      response = parse_response(response)
+      response["PATH_INFO"].should == "/foo"
+      response["rack.input"].should == "foobar"
+    end
+
+    it "allows to run requests shortcuts on client" do
+      client = Kirk::Client.new
+      response = parse_response client.get("http://localhost:9090/foo")
+      response["PATH_INFO"].should      == "/foo"
+      response["REQUEST_METHOD"].should == "GET"
+
+      response = parse_response client.post("http://localhost:9090/foo")
+      response["PATH_INFO"].should      == "/foo"
+      response["REQUEST_METHOD"].should == "POST"
+
+      response = parse_response client.put("http://localhost:9090/foo")
+      response["PATH_INFO"].should      == "/foo"
+      response["REQUEST_METHOD"].should == "PUT"
+
+      response = parse_response client.delete("http://localhost:9090/foo")
+      response["PATH_INFO"].should      == "/foo"
+      response["REQUEST_METHOD"].should == "DELETE"
+    end
+
     it "allows to pass block for request" do
       handler = Class.new do
         def initialize(buffer)

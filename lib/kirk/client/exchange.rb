@@ -26,7 +26,9 @@ module Kirk
 
         if request.headers
           request.headers.each do |name, val|
-            self.set_request_header(name.to_s, val.to_s)
+            name = name.to_s
+            val  = val.to_s
+            self.set_request_header(name, val)
           end
         end
 

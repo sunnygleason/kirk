@@ -132,6 +132,19 @@ describe 'Kirk::Client' do
       response = parse_response(group.responses.first)
       response["rack.input"].should == "zomg"
     end
+
+    it "handles setting the content type" do
+      group = Kirk::Client.group do |g|
+        g.request :GET, "http://localhost:9090/", nil, nil, {
+          'Accept'          => 'multipart/mixed, application/json;q=0.7, */*;q=0.5',
+          'X-Riak-ClientId' => '12345'
+        }
+      end
+
+      response = parse_response(group.responses.first)
+      response['HTTP_ACCEPT'].should          == 'multipart/mixed, application/json;q=0.7, */*;q=0.5'
+      response['HTTP_X_RIAK_CLIENTID'].should == '12345'
+    end
   end
 
   it "sets the response status when it is successful" do

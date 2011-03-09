@@ -292,7 +292,7 @@ public class RewindableInputStream extends FilterInputStream {
       }
     }
 
-    buf.clear().limit((int) length);
+    buf.clear().limit(Math.min((int) length, buf.capacity()));
 
     if ( buffered > position ) {
       tmpFile.position(position);

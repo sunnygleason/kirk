@@ -4,9 +4,6 @@ describe "Kirk CLI interface" do
   it "reads the configuration file, starts kirk, then redeploys" do
     kirk "-c #{kirked_up_path}/Kirkfile" do |c|
       c.stdout.gets.should =~ /INFO - jetty/
-      c.stdout.gets.should =~ /INFO - started o.e.j.s.h.ContextHandler/
-      c.stdout.gets.should =~ /INFO - started o.e.j.s.h.ContextHandler/
-      c.stdout.gets.should =~ /INFO - started o.e.j.s.h.ContextHandler/
       c.stdout.gets.should =~ /INFO - Started SelectChannelConnector@0\.0\.0\.0:9090/
 
       get '/'
@@ -36,7 +33,7 @@ describe "Kirk CLI interface" do
 
   it "exits with an error if the config file does not exist" do
     kirk do |c|
-      c.stderr.read.chomp.should == "[ERROR] config file `/Users/carllerche/Developer/Source/kirk/Kirkfile` does not exist"
+      c.stderr.read.chomp.should =~ /\[ERROR\] config file `.*?\/Kirkfile` does not exist/
     end
 
     last_command.exit_status.should == 1

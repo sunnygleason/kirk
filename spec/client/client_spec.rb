@@ -79,15 +79,32 @@ describe 'Kirk::Client' do
     end
 
     it "allows to use simplified syntax" do
+      class MyHandler
+        class << self
+          attr_accessor :response_count
+        end
+
+        self.response_count = 0
+
+        def on_response_complete(response)
+          self.class.response_count += 1
+        end
+      end
+      h = MyHandler.new
       group = Kirk::Client.group(:host => "localhost:9090") do |g|
-        g.get    '/'
-        g.put    '/'
-        g.post   '/'
-        g.delete '/'
+        g.get    '/', h, 'get.body',    {'X-Request-Method' => 'get'}
+        g.put    '/', h, 'put.body',    {'X-Request-Method' => 'put'}
+        g.post   '/', h, 'post.body',   {'X-Request-Method' => 'post'}
+        g.delete '/', h, 'delete.body', {'X-Request-Method' => 'delete'}
       end
 
       responses = parse_responses(group.responses)
-      responses.map {|r| r["REQUEST_METHOD"] }.sort.should == ["DELETE", "GET", "POST", "PUT"]
+      expected = ["DELETE delete delete.body", "GET get get.body",
+                  "POST post post.body", "PUT put put.body"]
+      responses.map do |r|
+        [r["REQUEST_METHOD"], r["HTTP_X_REQUEST_METHOD"], r["rack.input"]].join ' '
+      end.sort.should == expected
+      MyHandler.response_count.should == 4
     end
 
     it "performs simple GET" do
@@ -244,11 +261,9 @@ describe 'Kirk::Client' do
       end
 
       sleep(0.05)
-      @buffer.first.should == {
-        'Content-Type'   => 'text/plain',
-        'Content-Length' => '5',
-        'Server'         => 'Jetty(7.3.0.v20110203)'
-      }
+      @buffer.first['Content-Type'].should == 'text/plain'
+      @buffer.first['Content-Length'].should == '5'
+      @buffer.first['Server'].should =~ /Jetty([^\)]+)/
     end
 
     it "calls complete callback after finishing all the requests" do

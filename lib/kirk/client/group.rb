@@ -56,8 +56,8 @@ module Kirk
 
       %w/get post put delete head/.each do |method|
         class_eval <<-RUBY
-          def #{method}(url, headers = nil, handler = nil)
-            request(:#{method.upcase}, url, headers, handler)
+          def #{method}(url, handler = nil, body = nil, headers = {})
+            request(:#{method.upcase}, url, handler, body, headers)
           end
         RUBY
       end

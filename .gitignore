@@ -2,5 +2,5 @@ build
 lib/kirk/native.jar
 Gemfile.lock
 *.gem
-
 stress/train_app/log
+tmp

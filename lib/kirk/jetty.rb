@@ -2,7 +2,7 @@
 unless Kirk.sub_process?
   require "kirk/jetty/servlet-api-2.5"
 
-  %w(util http io continuation server client).each do |mod|
+  %w(util http io continuation server servlets security client).each do |mod|
     require "kirk/jetty/jetty-#{mod}-7.3.1.v20110307"
   end
 end
@@ -17,9 +17,12 @@ module Kirk
     java_import "org.eclipse.jetty.io.ByteArrayBuffer"
 
     java_import "org.eclipse.jetty.server.nio.SelectChannelConnector"
+    java_import "org.eclipse.jetty.server.handler.HandlerCollection"
+    java_import "org.eclipse.jetty.server.handler.RequestLogHandler"
     java_import "org.eclipse.jetty.server.handler.AbstractHandler"
     java_import "org.eclipse.jetty.server.handler.ContextHandler"
     java_import "org.eclipse.jetty.server.handler.ContextHandlerCollection"
+    java_import "org.eclipse.jetty.server.NCSARequestLog"
     java_import "org.eclipse.jetty.server.Server"
 
     java_import "org.eclipse.jetty.util.component.LifeCycle"

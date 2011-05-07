@@ -92,7 +92,11 @@ module Kirk
             application.add_watcher(watcher)
 
             ctx.set_connector_names c.listen
-            ctx.set_handler application
+
+            handlers          = Jetty::HandlerCollection.new
+            handlers.handlers = [ application, create_loghandler(c) ]
+
+            ctx.set_handler handlers
           end
         end
 
@@ -144,6 +148,28 @@ module Kirk
           config.watch          = [ ]
           config.bootstrap_path = File.expand_path('../bootstrap.rb', __FILE__)
         end
+      end
+
+      def create_loghandler( c )
+        app_dir = File.dirname( c.rackup )
+
+        [ "#{app_dir}/log", "#{app_dir}/log/jetty" ].each do |d|
+          (Dir.mkdir(d) or raise "unable to create jetty log dir") unless File.exists?(d)
+        end
+
+        log_name = "#{app_dir}/log/jetty/jetty-yyyy_mm_dd.request.log"
+
+        ncsa_log = Jetty::NCSARequestLog.new(log_name).tap do |log|
+          log.retain_days   = 180
+          log.append        = true
+          log.extended      = true
+          log.log_latency   = true
+          log.log_time_zone = "UTC"
+        end
+
+        log_handler = Jetty::RequestLogHandler.new
+        log_handler.request_log = ncsa_log
+        log_handler
       end
     end
   end

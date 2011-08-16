@@ -1,6 +1,7 @@
 module Kirk
   class Server
     class Handler < Jetty::AbstractHandler
+      java_import 'java.util.UUID'
       java_import 'java.util.zip.GZIPInputStream'
       java_import 'java.util.zip.InflaterInputStream'
 
@@ -9,6 +10,9 @@ module Kirk
       InputStream
 
       # Required environment variable keys
+      REQUEST_URL    = 'REQUEST_URL'.freeze
+      REQUEST_UUID   = 'REQUEST_UUID'.freeze
+      USER_ID        = 'USER_ID'.freeze
       REQUEST_METHOD = 'REQUEST_METHOD'.freeze
       SCRIPT_NAME    = 'SCRIPT_NAME'.freeze
       PATH_INFO      = 'PATH_INFO'.freeze
@@ -66,6 +70,8 @@ module Kirk
           env = DEFAULT_RACK_ENV.merge(
             SCRIPT_NAME     => "",
             PATH_INFO       => request.get_path_info,
+            REQUEST_UUID    => UUID::randomUUID.to_s,
+            REQUEST_URL     => request.getRequestURL.to_s + (request.get_query_string ? "?" + request.get_query_string : ""),
             REQUEST_URI     => request.getRequestURI,
             REQUEST_METHOD  => request.get_method       || "GET",
             RACK_URL_SCHEME => request.get_scheme       || "http",
@@ -110,8 +116,24 @@ module Kirk
           input = InputStream.new(input)
           env[RACK_INPUT] = input
 
+          #--------------------
+          Kirk::REQUEST_INFO.update("X-Request-ID", env[REQUEST_UUID])
+          Kirk::REQUEST_INFO.update("Referer", env[REQUEST_URL])
+          response.add_header("X-Request-ID", env[REQUEST_UUID])
+          if (request.cookies)
+            c = request.cookies.detect {|c| c.name == "_session_id" }
+            if c
+              response.add_header("X-Session-ID", c.value)
+              Kirk::REQUEST_INFO.update("X-Session-ID", c.value)
+            end
+          end
+          #--------------------
+
           # Dispatch the request
           status, headers, body = @app.call(env)
+
+          response.add_header("X-User-ID", Kirk::REQUEST_INFO.get["X-User-ID"]) if Kirk::REQUEST_INFO.get["X-User-ID"]
+          Kirk::REQUEST_INFO.clear
 
           response.set_status(status.to_i)
 

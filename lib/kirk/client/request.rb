@@ -12,6 +12,8 @@ class Kirk::Client
       @headers  = headers
       @method   = normalize_method(method)
 
+      self.headers.merge!(Kirk::REQUEST_INFO.get) if Kirk::REQUEST_INFO.get
+
       yield self if block_given?
     end
 

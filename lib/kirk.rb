@@ -15,10 +15,12 @@ module Kirk
   autoload :Native, 'kirk/native'
   autoload :Server, 'kirk/server'
 
+  java_import 'java.lang.ThreadLocal'
   java_import "java.net.InetSocketAddress"
   java_import "java.nio.ByteBuffer"
 
   java_import "java.util.concurrent.AbstractExecutorService"
+  java_import "java.util.concurrent.ConcurrentHashMap"
   java_import "java.util.concurrent.ExecutorCompletionService"
   java_import "java.util.concurrent.LinkedBlockingQueue"
   java_import "java.util.concurrent.TimeUnit"
@@ -52,4 +54,19 @@ module Kirk
       handler.set_formatter(Native::LogFormatter.new)
     end
   end
+
+  class RequestInfo < ThreadLocal
+    def update(k, v)
+      unless (self.get)
+        self.set(ConcurrentHashMap.new)
+      end
+      self.get.put(k, v)
+    end
+    
+    def clear
+      self.get.clear if self.get
+    end
+  end
+  
+  REQUEST_INFO = RequestInfo.new
 end

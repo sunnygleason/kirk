@@ -165,6 +165,7 @@ module Kirk
           log.extended      = true
           log.log_latency   = true
           log.log_time_zone = "UTC"
+          log.prefer_proxied_for_address = true
         end
 
         log_handler = Jetty::RequestLogHandler.new

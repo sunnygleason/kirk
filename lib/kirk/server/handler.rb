@@ -1,9 +1,12 @@
 module Kirk
   class Server
     class Handler < Jetty::AbstractHandler
+      java_import 'java.io.ByteArrayOutputStream'
       java_import 'java.util.UUID'
+      java_import 'java.util.HashSet'
       java_import 'java.util.zip.GZIPInputStream'
       java_import 'java.util.zip.InflaterInputStream'
+      java_import 'java.util.zip.GZIPOutputStream'
 
       # Trigger the autoload so that the first access to the class
       # does not happen in a thread.
@@ -54,6 +57,12 @@ module Kirk
         RACK_MULTIPROCESS => false,
         RACK_RUN_ONCE     => false,
       }
+
+      GZIP_CONTENT_TYPES = HashSet.new.tap do |t|
+        t << "text/plain";
+        t << "text/html";
+        t << "application/json";
+      end
 
       CONTENT_LENGTH_TYPE_REGEXP = /^Content-(?:Type|Length)$/i
 
@@ -116,33 +125,34 @@ module Kirk
           input = InputStream.new(input)
           env[RACK_INPUT] = input
 
-          #--------------------
+          #-------------------- detailed logging, part I
           Kirk::REQUEST_INFO.update("X-Request-ID", env[REQUEST_UUID])
           Kirk::REQUEST_INFO.update("Referer", env[REQUEST_URL])
-          response.add_header("X-Request-ID", env[REQUEST_UUID])
           if (request.cookies)
             c = request.cookies.detect {|c| c.name == "_session_id" }
-            if c
-              response.add_header("X-Session-ID", c.value)
-              Kirk::REQUEST_INFO.update("X-Session-ID", c.value)
-            end
+            Kirk::REQUEST_INFO.update("X-Session-ID", c.value) if c
           end
           #--------------------
 
           # Dispatch the request
           status, headers, body = @app.call(env)
 
-          response.add_header("X-User-ID", Kirk::REQUEST_INFO.get["X-User-ID"]) if Kirk::REQUEST_INFO.get["X-User-ID"]
-          Kirk::REQUEST_INFO.clear
-
           response.set_status(status.to_i)
+
+          #-------------------- gzip encoding, part I
+          compress = status.to_i == 200 &&
+                     request.get_header("Accept-Encoding") && request.get_header("Accept-Encoding").include?("gzip") &&
+                     (!headers["Content-Length"] || (headers["Content-Length"] && headers["Content-Length"].to_i > 256)) &&
+                     headers["Content-Type"] &&
+                     GZIP_CONTENT_TYPES.contains(headers["Content-Type"].split(";")[0])
+          #--------------------
 
           headers.each do |header, value|
             case header
             when CONTENT_TYPE_RESP
               response.set_content_type(value)
             when CONTENT_LENGTH_RESP
-              response.set_content_length(value.to_i)
+              response.set_content_length(value.to_i) unless compress
             else
               value.split("\n").each do |v|
                 response.add_header(header, v)
@@ -150,12 +160,43 @@ module Kirk
             end
           end
 
-          buffer = response.get_output_stream
-          body.each do |s|
-            buffer.write(s.to_java_bytes)
+          #-------------------- detailed logging, part II
+          ["X-User-ID", "X-Session-ID", "X-Request-ID"].each do |h|
+            response.add_header(h, Kirk::REQUEST_INFO.get[h]) if Kirk::REQUEST_INFO.get[h]
           end
 
+          Kirk::REQUEST_INFO.clear
+          #--------------------
+
+          #-------------------- gzip encoding, part II
+          out_buffer = ByteArrayOutputStream.new
+          buffer = compress ? GZIPOutputStream.new(out_buffer) : out_buffer
+
+          out_length = 0
+          body.each do |s|
+            c = s.to_java_bytes
+            buffer.write(c)
+            out_length += c.length
+          end
+          buffer.close
+
+          out_content = out_buffer.to_byte_array
+          response.add_header("Content-Encoding", "gzip") if compress
+          response.set_content_length(out_content.length.to_i) if compress
+          response.add_header("X-Original-Content-Length", out_length.to_s) if compress
+          response.get_output_stream.tap do |t|
+            begin
+              t.write(out_content)
+            ensure
+              t.close
+            end
+          end
+          #--------------------
+
           body.close if body.respond_to?(:close)
+        rescue Exception => e
+          Kirk.logger.warning e.to_s
+          Kirk.logger.warning e.backtrace.join("|")
         ensure
           input.recycle if input.respond_to?(:recycle)
           request.set_handled(true)

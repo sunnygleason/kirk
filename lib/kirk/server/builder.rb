@@ -159,7 +159,7 @@ module Kirk
 
         log_name = "#{app_dir}/log/jetty/jetty-yyyy_mm_dd.request.log"
 
-        ncsa_log = Jetty::NCSARequestLog.new(log_name).tap do |log|
+        ncsa_log = Kirk::Native::ExtendedNCSARequestLog.new(log_name).tap do |log|
           log.retain_days   = 180
           log.append        = true
           log.extended      = true

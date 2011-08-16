@@ -22,7 +22,6 @@ module Kirk
     java_import "org.eclipse.jetty.server.handler.AbstractHandler"
     java_import "org.eclipse.jetty.server.handler.ContextHandler"
     java_import "org.eclipse.jetty.server.handler.ContextHandlerCollection"
-    java_import "org.eclipse.jetty.server.NCSARequestLog"
     java_import "org.eclipse.jetty.server.Server"
 
     java_import "org.eclipse.jetty.util.component.LifeCycle"

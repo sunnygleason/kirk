@@ -152,12 +152,13 @@ module Kirk
 
       def create_loghandler( c )
         app_dir = File.dirname( c.rackup )
+        hostname = `hostname`.split(".").shift
 
         [ "#{app_dir}/log", "#{app_dir}/log/jetty" ].each do |d|
           (Dir.mkdir(d) or raise "unable to create jetty log dir") unless File.exists?(d)
         end
 
-        log_name = "#{app_dir}/log/jetty/jetty-yyyy_mm_dd.request.log"
+        log_name = "#{app_dir}/log/jetty/jetty-#{hostname}-yyyy_mm_dd.request.log"
 
         ncsa_log = Kirk::Native::ExtendedNCSARequestLog.new(log_name).tap do |log|
           log.retain_days   = 180

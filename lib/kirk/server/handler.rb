@@ -58,12 +58,6 @@ module Kirk
         RACK_RUN_ONCE     => false,
       }
 
-      GZIP_CONTENT_TYPES = HashSet.new.tap do |t|
-        t << "text/plain";
-        t << "text/html";
-        t << "application/json";
-      end
-
       CONTENT_LENGTH_TYPE_REGEXP = /^Content-(?:Type|Length)$/i
 
       def self.new(app)
@@ -139,20 +133,12 @@ module Kirk
 
           response.set_status(status.to_i)
 
-          #-------------------- gzip encoding, part I
-          compress = status.to_i == 200 &&
-                     request.get_header("Accept-Encoding") && request.get_header("Accept-Encoding").include?("gzip") &&
-                     (!headers["Content-Length"] || (headers["Content-Length"] && headers["Content-Length"].to_i > 256)) &&
-                     headers["Content-Type"] &&
-                     GZIP_CONTENT_TYPES.contains(headers["Content-Type"].split(";")[0])
-          #--------------------
-
           headers.each do |header, value|
             case header
             when CONTENT_TYPE_RESP
               response.set_content_type(value)
             when CONTENT_LENGTH_RESP
-              response.set_content_length(value.to_i) unless compress
+              response.set_content_length(value.to_i)
             else
               value.split("\n").each do |v|
                 response.add_header(header, v)
@@ -168,30 +154,15 @@ module Kirk
           Kirk::REQUEST_INFO.clear
           #--------------------
 
-          #-------------------- gzip encoding, part II
-          out_buffer = ByteArrayOutputStream.new
-          buffer = compress ? GZIPOutputStream.new(out_buffer) : out_buffer
-
-          out_length = 0
-          body.each do |s|
-            c = s.to_java_bytes
-            buffer.write(c)
-            out_length += c.length
-          end
-          buffer.close
-
-          out_content = out_buffer.to_byte_array
-          response.add_header("Content-Encoding", "gzip") if compress
-          response.set_content_length(out_content.length.to_i) if compress
-          response.add_header("X-Original-Content-Length", out_length.to_s) if compress
           response.get_output_stream.tap do |t|
             begin
-              t.write(out_content)
+              body.each do |s|
+                t.write(s.to_java_bytes)
+              end
             ensure
               t.close
             end
           end
-          #--------------------
 
           body.close if body.respond_to?(:close)
         rescue Exception => e

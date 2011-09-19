@@ -160,17 +160,10 @@ module Kirk
 
         log_name = "#{app_dir}/log/jetty/jetty-#{hostname}-yyyy_mm_dd.request.log"
 
-        ncsa_log = Kirk::Native::ExtendedNCSARequestLog.new(log_name).tap do |log|
-          log.retain_days   = 180
-          log.append        = true
-          log.extended      = true
-          log.log_latency   = true
-          log.log_time_zone = "UTC"
-          log.prefer_proxied_for_address = true
-        end
+        json_log = Kirk::Native::ExtendedHttpRequestLogV20110917.new(log_name)
 
         log_handler = Jetty::RequestLogHandler.new
-        log_handler.request_log = ncsa_log
+        log_handler.request_log = json_log
         log_handler
       end
     end

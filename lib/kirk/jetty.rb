@@ -1,6 +1,9 @@
 # Only require jars if in the "master" process
 unless Kirk.sub_process?
   require "kirk/jetty/servlet-api-2.5"
+  require "kirk/jetty/jackson-core-asl-1.8.5"
+  require "kirk/jetty/jackson-mapper-asl-1.8.5"
+  require "kirk/jetty/joda-time-1.6.2"
 
   %w(util http io continuation server servlets security client).each do |mod|
     require "kirk/jetty/jetty-#{mod}-7.3.1.v20110307"

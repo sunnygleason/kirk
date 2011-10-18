@@ -120,6 +120,7 @@ module Kirk
           env[RACK_INPUT] = input
 
           #-------------------- detailed logging, part I
+          request.set_attribute("t0_millis", java::lang::System::currentTimeMillis)
           request.set_attribute("t1_nanos", java::lang::System::nanoTime)
           Kirk::REQUEST_INFO.update("X-Request-ID", env[REQUEST_UUID])
           Kirk::REQUEST_INFO.update("Referer", env[REQUEST_URL])

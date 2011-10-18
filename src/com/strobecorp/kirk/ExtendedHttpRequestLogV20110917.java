@@ -122,11 +122,12 @@ public class ExtendedHttpRequestLogV20110917 extends AbstractLifeCycle
 
             out.put("_", 17);
 
+            Long t0  = (Long) request.getAttribute("t0_millis");
             Long t1 = (Long) request.getAttribute("t1_nanos");
             long t2 = System.nanoTime();
 
             if (t1 != null) {
-                out.put("d", dateFormat.print(t1 / 1000000));
+                out.put("d", dateFormat.print(t0));
             }
 
             String uuid = (String) response.getHeader("X-Request-ID");
